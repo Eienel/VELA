@@ -9,19 +9,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'No text provided' }, { status: 400 });
   }
 
-  // 1) Primary: Google Cloud Text-to-Speech (free tier, works from Vercel)
+  // 1) Primary: Gemini native TTS (free tier, no billing, works from Vercel)
   try {
-    const audio = await synthesizeGoogleTTS(text);
-    if (audio) {
-      return new Response(new Uint8Array(audio), {
+    const result = await synthesizeGoogleTTS(text);
+    if (result) {
+      return new Response(new Uint8Array(result.audio), {
         headers: {
-          'Content-Type': 'audio/mpeg',
+          'Content-Type': result.contentType,
           'Cache-Control': 'no-store',
         },
       });
     }
   } catch (error) {
-    console.error('Google TTS failed, trying ElevenLabs:', error);
+    console.error('Gemini TTS failed, trying ElevenLabs:', error);
   }
 
   // 2) Fallback: ElevenLabs (if a paid key is configured)
