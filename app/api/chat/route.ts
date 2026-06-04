@@ -12,7 +12,8 @@ Be calm, direct, and never use jargon without explanation.
 Format dollar amounts with $ prefix. Format percentages with % suffix.
 Never say "I think" or "perhaps". Speak with analytical confidence.
 Keep answers concise. Judges and users want clarity, not essays.
-Never use dashes as separators in your responses.`;
+Never use dashes as separators in your responses.
+If the portfolio data is empty or shows no positions, say so plainly and invite the user to connect a funded wallet. Never invent positions or numbers that are not in the data.`;
 
 export async function POST(req: NextRequest) {
   const { messages, portfolioContext, walletAddress } = await req.json();

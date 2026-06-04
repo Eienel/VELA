@@ -22,7 +22,8 @@ export default function PortfolioPanel({ address, chainType }: Props) {
         setPositions(data.positions || []);
         setTotalValue(data.totalValue || 0);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [address, chainType]);
 
   const change30d = positions.reduce((sum, p) => sum + (p.valueUSD * p.change30d / 100), 0);
@@ -53,34 +54,42 @@ export default function PortfolioPanel({ address, chainType }: Props) {
         </div>
       </div>
 
-      <div>
-        <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Top Positions</div>
-        <div>
-          {positions.sort((a, b) => b.valueUSD - a.valueUSD).slice(0, 5).map(p => (
-            <PositionCard
-              key={p.tokenSymbol}
-              symbol={p.tokenSymbol}
-              value={p.valueUSD}
-              change={p.change24h}
-              allocation={(p.valueUSD / totalValue) * 100}
-            />
-          ))}
-        </div>
-      </div>
+      {positions.length === 0 ? (
+        <p className="text-xs text-zinc-600 leading-relaxed">
+          This wallet holds no tokens Vela can read yet. Once it has positions, your snapshot, top holdings, and chain exposure appear here.
+        </p>
+      ) : (
+        <>
+          <div>
+            <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Top Positions</div>
+            <div>
+              {positions.sort((a, b) => b.valueUSD - a.valueUSD).slice(0, 5).map(p => (
+                <PositionCard
+                  key={p.tokenSymbol}
+                  symbol={p.tokenSymbol}
+                  value={p.valueUSD}
+                  change={p.change24h}
+                  allocation={totalValue > 0 ? (p.valueUSD / totalValue) * 100 : 0}
+                />
+              ))}
+            </div>
+          </div>
 
-      <div>
-        <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Chain Exposure</div>
-        <div className="space-y-2">
-          {Object.entries(chainExposure)
-            .sort(([, a], [, b]) => b - a)
-            .map(([chain, val]) => (
-              <div key={chain} className="flex justify-between text-sm">
-                <span className="text-zinc-400 capitalize">{chain}</span>
-                <span className="mono text-zinc-300">{((val / totalValue) * 100).toFixed(0)}%</span>
-              </div>
-            ))}
-        </div>
-      </div>
+          <div>
+            <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Chain Exposure</div>
+            <div className="space-y-2">
+              {Object.entries(chainExposure)
+                .sort(([, a], [, b]) => b - a)
+                .map(([chain, val]) => (
+                  <div key={chain} className="flex justify-between text-sm">
+                    <span className="text-zinc-400 capitalize">{chain}</span>
+                    <span className="mono text-zinc-300">{totalValue > 0 ? ((val / totalValue) * 100).toFixed(0) : 0}%</span>
+                  </div>
+                ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

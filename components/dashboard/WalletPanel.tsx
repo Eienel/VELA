@@ -21,7 +21,8 @@ export default function WalletPanel({ address, chainType }: Props) {
         setPositions(data.positions || []);
         setTotalValue(data.totalValue || 0);
         setLoading(false);
-      });
+      })
+      .catch(() => setLoading(false));
   }, [address, chainType]);
 
   const change24h = positions.reduce((sum, p) => sum + (p.valueUSD * p.change24h / 100), 0);
@@ -30,7 +31,7 @@ export default function WalletPanel({ address, chainType }: Props) {
   const allocationBars = positions
     .sort((a, b) => b.valueUSD - a.valueUSD)
     .slice(0, 5)
-    .map(p => ({ symbol: p.tokenSymbol, pct: (p.valueUSD / totalValue) * 100 }));
+    .map(p => ({ symbol: p.tokenSymbol, pct: totalValue > 0 ? (p.valueUSD / totalValue) * 100 : 0 }));
 
   if (loading) {
     return (
@@ -61,6 +62,11 @@ export default function WalletPanel({ address, chainType }: Props) {
 
       <div>
         <div className="text-xs uppercase tracking-widest text-zinc-500 mb-3">Positions ({positions.length})</div>
+        {positions.length === 0 ? (
+          <p className="text-xs text-zinc-600 leading-relaxed">
+            No token balances found on this wallet. Connect a funded wallet or use the demo wallet to explore Vela.
+          </p>
+        ) : (
         <div className="space-y-2.5">
           {allocationBars.map(item => (
             <div key={item.symbol}>
@@ -77,6 +83,7 @@ export default function WalletPanel({ address, chainType }: Props) {
             </div>
           ))}
         </div>
+        )}
       </div>
     </div>
   );
