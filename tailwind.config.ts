@@ -9,8 +9,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: "var(--background)",
-        foreground: "var(--foreground)",
+        accent: '#f59e0b',
+        'accent-bright': '#fbbf24',
+        positive: '#22c55e',
+        negative: '#ef4444',
+        surface: '#18181b',
+        border: '#27272a',
+        muted: '#71717a',
+      },
+      fontFamily: {
+        sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Helvetica Neue"', 'system-ui', 'sans-serif'],
+        mono: ['"SF Mono"', 'ui-monospace', '"Cascadia Code"', '"Fira Code"', 'monospace'],
       },
     },
   },
