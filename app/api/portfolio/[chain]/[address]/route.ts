@@ -17,16 +17,23 @@ export async function GET(
       positions = await getEVMPortfolio(address);
     }
 
-    await upsertPositions(address, positions);
-
     const totalValue = positions.reduce((sum, p) => sum + p.valueUSD, 0);
-    await upsertWallet({
-      address,
-      chainType: chain === 'solana' ? 'solana' : 'evm',
-      chains: Array.from(new Set(positions.map(p => p.chain))),
-      lastScanned: new Date(),
-      totalValueUSD: totalValue,
-    });
+
+    // Persist to MongoDB (agent memory). Non-blocking: if the DB is
+    // unconfigured or unreachable, still return the portfolio so the
+    // dashboard works.
+    try {
+      await upsertPositions(address, positions);
+      await upsertWallet({
+        address,
+        chainType: chain === 'solana' ? 'solana' : 'evm',
+        chains: Array.from(new Set(positions.map(p => p.chain))),
+        lastScanned: new Date(),
+        totalValueUSD: totalValue,
+      });
+    } catch (dbError) {
+      console.error('MongoDB persist skipped:', dbError);
+    }
 
     return NextResponse.json({ positions, totalValue });
   } catch (error) {

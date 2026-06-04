@@ -1,6 +1,6 @@
 import { MongoClient, Db } from 'mongodb';
 
-const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017';
+const uri = process.env.MONGODB_URI;
 
 // Cache the client promise across hot-reloads (dev) and warm serverless
 // invocations (prod) so we don't open a new connection on every request.
@@ -9,8 +9,13 @@ const globalForMongo = global as unknown as {
 };
 
 function getClientPromise(): Promise<MongoClient> {
+  // Fail fast when no DB is configured so callers can skip persistence
+  // instead of hanging on a connection timeout.
+  if (!uri) {
+    throw new Error('MONGODB_URI is not set');
+  }
   if (!globalForMongo._mongoClientPromise) {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
     globalForMongo._mongoClientPromise = client.connect();
   }
   return globalForMongo._mongoClientPromise;
