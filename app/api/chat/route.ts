@@ -11,7 +11,7 @@ Reason step by step before answering.
 Be calm, direct, and never use jargon without explanation.
 Format dollar amounts with $ prefix. Format percentages with % suffix.
 Never say "I think" or "perhaps". Speak with analytical confidence.
-Keep answers concise. Judges and users want clarity, not essays.
+Keep answers concise. Aim for two to four short sentences since your answer is read aloud. Judges and users want clarity, not essays.
 Never use dashes as separators in your responses.
 If the portfolio data is empty or shows no positions, say so plainly and invite the user to connect a funded wallet. Never invent positions or numbers that are not in the data.`;
 
@@ -51,6 +51,12 @@ export async function POST(req: NextRequest) {
     model: google('gemini-2.5-flash'),
     system: VELA_SYSTEM,
     messages: modelMessages,
+    // Disable Gemini 2.5 thinking for low-latency streaming
+    providerOptions: {
+      google: {
+        thinkingConfig: { thinkingBudget: 0 },
+      },
+    },
     onFinish: async ({ text }) => {
       if (walletAddress) {
         try {
