@@ -17,6 +17,7 @@ export async function getEVMPortfolio(address: string): Promise<Position[]> {
       change30d: 8.2,
       costBasisUSD: 20960,
       unrealizedPnL: 1735,
+      correlationToETH: 1.0,
       updatedAt: now,
     },
     {
@@ -32,6 +33,7 @@ export async function getEVMPortfolio(address: string): Promise<Position[]> {
       change30d: -18.3,
       costBasisUSD: 11722,
       unrealizedPnL: -847,
+      correlationToETH: 0.87,
       updatedAt: now,
     },
     {
@@ -47,6 +49,7 @@ export async function getEVMPortfolio(address: string): Promise<Position[]> {
       change30d: 0,
       costBasisUSD: 7092,
       unrealizedPnL: 0,
+      correlationToETH: 0.0,
       updatedAt: now,
     },
   ];

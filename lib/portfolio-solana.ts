@@ -16,6 +16,7 @@ export async function getSolanaPortfolio(address: string): Promise<Position[]> {
       change30d: 22.7,
       costBasisUSD: 3431,
       unrealizedPnL: 779,
+      correlationToETH: 0.62,
       updatedAt: now,
     },
     {
@@ -31,6 +32,7 @@ export async function getSolanaPortfolio(address: string): Promise<Position[]> {
       change30d: 15.4,
       costBasisUSD: 2130,
       unrealizedPnL: 281,
+      correlationToETH: 0.55,
       updatedAt: now,
     },
   ];
