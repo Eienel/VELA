@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #09090b;
+  --surface: #18181b;
+  --border: #27272a;
+  --muted: #71717a;
+  --text: #d4d4d8;
+  --text-primary: #fafafa;
+  --accent: #f59e0b;
+  --accent-bright: #fbbf24;
+  --positive: #22c55e;
+  --negative: #ef4444;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+.mono {
+  font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
+}
+
+@layer utilities {
+  .font-mono-numbers {
+    font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  }
+}
