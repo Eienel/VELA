@@ -47,11 +47,34 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
+  // Free browser-native fallback when ElevenLabs is unavailable
+  const speakWithBrowser = (id: string, text: string) => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) {
+      setPlayingId(null);
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    // Prefer a calm English voice if available
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Google|Samantha|Daniel/i.test(v.name))
+      || voices.find(v => /en/i.test(v.lang));
+    if (preferred) utterance.voice = preferred;
+    utterance.onend = () => setPlayingId(null);
+    setPlayingId(id);
+    window.speechSynthesis.speak(utterance);
+  };
+
   const playAudio = async (id: string, text: string) => {
     try {
       if (audioRef.current) {
         audioRef.current.pause();
         audioRef.current = null;
+      }
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
       }
       setPlayingId(id);
       const response = await fetch('/api/voice', {
@@ -59,8 +82,10 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
-      if (!response.ok) { setPlayingId(null); return; }
+      // ElevenLabs unavailable (e.g. free tier blocked) -> browser TTS
+      if (!response.ok) { speakWithBrowser(id, text); return; }
       const blob = await response.blob();
+      if (blob.size === 0 || !blob.type.includes('audio')) { speakWithBrowser(id, text); return; }
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       audioRef.current = audio;
@@ -70,7 +95,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
         URL.revokeObjectURL(url);
       };
     } catch {
-      setPlayingId(null);
+      speakWithBrowser(id, text);
     }
   };
 
