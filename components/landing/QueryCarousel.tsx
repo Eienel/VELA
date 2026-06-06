@@ -19,13 +19,11 @@ function MarqueeRow({ items, reverse = false }: { items: string[]; reverse?: boo
       <motion.div
         animate={{ x: reverse ? ['-50%', '0%'] : ['0%', '-50%'] }}
         transition={{ duration: 50, repeat: Infinity, ease: 'linear' }}
-        className="flex gap-3 w-max"
+        className="flex gap-2.5 w-max"
       >
         {doubled.map((q, i) => (
-          <div
-            key={i}
-            className="flex-shrink-0 px-4 py-2 glass rounded-full font-mono text-[12px] text-white/40 hover:text-white/70 transition-colors cursor-default whitespace-nowrap"
-          >
+          <div key={i} className="flex-shrink-0 px-4 py-2 bg-white border border-[#E8E8ED] rounded-full font-mono text-[12px] text-[#6E6E73] whitespace-nowrap"
+            style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
             {q}
           </div>
         ))}
@@ -36,14 +34,8 @@ function MarqueeRow({ items, reverse = false }: { items: string[]; reverse?: boo
 
 export default function QueryCarousel() {
   return (
-    <section className="py-20 border-t border-white/[0.05] space-y-3 relative overflow-hidden">
-      {/* Subtle background glow */}
-      <div className="absolute inset-0 pointer-events-none"
-        style={{ background: 'radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255,149,0,0.04) 0%, transparent 70%)' }} />
-
-      <div className="text-[11px] tracking-[0.25em] text-white/25 font-mono uppercase mb-8 px-6 md:px-14 max-w-7xl mx-auto">
-        Ask anything
-      </div>
+    <section className="py-16 space-y-3 bg-[#FAFAFA] border-t border-[#F0F0F5]">
+      <div className="text-[11px] tracking-[0.2em] text-[#AEAEB2] font-mono uppercase mb-8 px-6 md:px-12 max-w-6xl mx-auto">Ask anything</div>
       <MarqueeRow items={row1} />
       <MarqueeRow items={row2} reverse />
     </section>
