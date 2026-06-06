@@ -1,7 +1,6 @@
 'use client';
 import { motion } from 'framer-motion';
 import { SpeakerHigh, SpeakerSlash } from '@phosphor-icons/react';
-import VelaMascot from './VelaMascot';
 
 interface Props {
   role: 'user' | 'assistant';
@@ -10,61 +9,72 @@ interface Props {
   isPlaying?: boolean;
 }
 
+// Safe inline number highlighter — no dangerouslySetInnerHTML
+function HighlightedText({ text }: { text: string }) {
+  const parts = text.split(/(\$[\d,]+\.?\d*|[\d,]+\.?\d*%|\d+\.?\d*[xX])/g);
+  return (
+    <>
+      {parts.map((part, i) =>
+        /^\$[\d,]+\.?\d*$|^[\d,]+\.?\d*%$|^\d+\.?\d*[xX]$/.test(part) ? (
+          <span key={i} className="font-mono text-amber-400">{part}</span>
+        ) : (
+          <span key={i}>{part}</span>
+        )
+      )}
+    </>
+  );
+}
+
 export default function MessageBubble({ role, content, onReplay, isPlaying }: Props) {
   if (role === 'user') {
     return (
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex justify-end mb-4"
+        transition={{ duration: 0.2 }}
+        className="flex justify-end mb-5"
       >
-        <div className="max-w-[70%] bg-zinc-800 rounded-2xl rounded-tr-sm px-4 py-3 text-zinc-100 text-sm">
+        <div className="max-w-[72%] bg-zinc-800/80 border border-zinc-700/50 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-zinc-100 leading-relaxed">
           {content}
         </div>
       </motion.div>
     );
   }
 
-  // Format numbers in amber mono
-  const formatContent = (text: string) => {
-    return text.replace(/(\$[\d,]+\.?\d*|[\d,]+\.?\d*%|\d+\.?\d*[xX])/g,
-      (match) => `<span class="mono text-amber-400">${match}</span>`);
-  };
-
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
-      className="flex gap-3 mb-4"
+      transition={{ duration: 0.2 }}
+      className="flex gap-3 mb-5"
     >
-      <div className="flex-shrink-0 mt-1">
-        <VelaMascot size={24} speaking={isPlaying} />
-      </div>
-      <div className="flex-1">
-        <div
-          className="text-zinc-200 text-sm leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: formatContent(content) }}
-        />
+      <div className="flex-1 border-l-2 border-amber-500/25 pl-3">
+        <div className="text-sm text-zinc-200 leading-relaxed">
+          <HighlightedText text={content} />
+        </div>
+
+        {/* Waveform while playing */}
         {isPlaying && (
-          <div className="flex gap-1 mt-2 items-end h-4">
-            {[0, 1, 2].map(i => (
+          <div className="flex gap-0.5 items-end h-3 mt-2">
+            {[0, 1, 2, 3, 4].map(i => (
               <motion.div
                 key={i}
-                animate={{ height: ['4px', '12px', '4px'] }}
-                transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
-                className="w-1 bg-amber-500 rounded-full"
-                style={{ minHeight: '4px' }}
+                animate={{ scaleY: [0.3, 1, 0.3] }}
+                transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
+                className="w-0.5 bg-amber-500 rounded-full origin-bottom"
+                style={{ height: '100%' }}
               />
             ))}
           </div>
         )}
+
         {onReplay && (
           <button
             onClick={onReplay}
-            className="mt-2 flex items-center gap-1 text-xs text-zinc-600 hover:text-zinc-400 transition-colors"
+            className="mt-2 flex items-center gap-1.5 text-xs text-zinc-700 hover:text-zinc-500 transition-colors"
           >
-            {isPlaying ? <SpeakerSlash size={12} /> : <SpeakerHigh size={12} />}
-            {isPlaying ? 'Playing' : 'Replay'}
+            {isPlaying ? <SpeakerSlash size={11} /> : <SpeakerHigh size={11} />}
+            {isPlaying ? 'Playing' : 'Replay voice'}
           </button>
         )}
       </div>

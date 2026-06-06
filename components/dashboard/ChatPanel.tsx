@@ -138,9 +138,9 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   ];
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#0c0c0e]">
       {/* Mascot header */}
-      <div className="flex flex-col items-center pt-6 pb-4 border-b border-zinc-800">
+      <div className="flex flex-col items-center pt-4 pb-4 border-b border-zinc-800">
         <VelaMascot
           size={48}
           thinking={isLoading && reasoningStep < 3}
@@ -159,7 +159,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
                 <button
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-xs px-3 py-1.5 border border-zinc-800 rounded-full text-zinc-500 hover:border-zinc-600 hover:text-zinc-400 transition-colors"
+                  className="text-xs px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 hover:border-zinc-700 transition-colors"
                 >
                   {q}
                 </button>
@@ -193,14 +193,14 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       </div>
 
       {/* Input */}
-      <div className="border-t border-zinc-800 px-4 py-3">
-        <form onSubmit={onSubmit} className="flex items-center gap-2">
+      <div className="px-4 py-3 border-t border-zinc-800">
+        <form onSubmit={onSubmit} className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800 rounded-xl px-3 py-1.5">
           <VoiceButton onTranscript={handleVoiceTranscript} disabled={isLoading} />
           <input
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
             placeholder="Ask Vela anything about your portfolio..."
-            className="flex-1 bg-transparent text-sm text-zinc-200 placeholder-zinc-600 outline-none"
+            className="flex-1 bg-transparent text-sm text-zinc-200 placeholder-zinc-700 outline-none"
             disabled={isLoading}
           />
           <button

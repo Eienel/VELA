@@ -14,7 +14,7 @@ interface Props {
 
 export default function ReasoningSteps({ activeStep }: Props) {
   return (
-    <div className="flex flex-col gap-1.5 py-2">
+    <div className="flex flex-col gap-1.5 py-3 px-4 my-2 rounded-xl bg-zinc-900/40 border border-zinc-800/50 mx-0">
       {steps.map((step, i) => (
         <motion.div
           key={step}

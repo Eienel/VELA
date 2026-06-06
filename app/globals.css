@@ -30,7 +30,17 @@ body {
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
+
+/* Smoother scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+
+/* Selection color */
+::selection { background: rgba(245,158,11,0.2); color: #fafafa; }
 
 .mono {
   font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;

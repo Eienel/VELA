@@ -70,7 +70,7 @@ export default function ConnectWallet({ onConnect }: Props) {
       </button>
       <button
         onClick={useDemoWallet}
-        className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors text-center py-1"
+        className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors text-center py-2 border border-zinc-800 rounded-lg hover:border-zinc-700 w-full"
       >
         Use demo wallet instead
       </button>
