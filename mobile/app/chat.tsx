@@ -73,7 +73,7 @@ export default function Chat() {
       }
       Speech.stop();
       setSpeaking(true);
-      const res = await fetchVoice(text, currentMood || mood);
+      const res = await fetchVoice(text, currentMood || mood, portfolio);
       if (res.ok) {
         const blob = await res.blob();
         // expo-av can play from base64 or uri — use Speech as simpler fallback

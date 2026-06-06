@@ -29,33 +29,63 @@ function pcmToWav(pcm: Buffer, sampleRate = SAMPLE_RATE): Buffer {
 
 export type Mood = 'thriving' | 'stable' | 'worried' | 'devastated';
 
-// Style prefix Gemini TTS understands and performs
-const MOOD_STYLE: Record<Mood, string> = {
-  thriving: 'Say the following in an upbeat, enthusiastic, and energetic voice — clearly happy and excited: ',
-  stable:   'Say the following in a calm, measured, and composed voice: ',
-  worried:  'Say the following in an anxious, concerned voice — clearly troubled and uneasy: ',
-  devastated: 'Say the following in a slow, dejected, sad voice — clearly hurt and disheartened: ',
+const MOOD_VOICE: Record<Mood, string> = {
+  thriving:   'Aoede',
+  stable:     'Kore',
+  worried:    'Kore',
+  devastated: 'Kore',
 };
 
-// Different voices also have personality — Kore is calm/neutral, Aoede is expressive
-const MOOD_VOICE: Record<Mood, string> = {
-  thriving:   'Aoede',   // expressive, bright
-  stable:     'Kore',    // neutral, calm
-  worried:    'Kore',    // same but tone shifts via style prompt
-  devastated: 'Kore',    // slower via style prompt
-};
+// Build a personalized style prompt from real portfolio numbers
+export function buildMoodStyle(mood: Mood, portfolioContext?: any): string {
+  const base = {
+    thriving:   'upbeat, enthusiastic, and energetic — clearly excited and proud',
+    stable:     'calm, measured, and composed — steady and matter-of-fact',
+    worried:    'anxious and concerned — clearly troubled and uneasy',
+    devastated: 'slow, dejected, and sad — clearly hurt and disheartened',
+  }[mood];
+
+  if (!portfolioContext?.positions?.length) {
+    return `Say the following in a ${base} voice: `;
+  }
+
+  const positions = portfolioContext.positions as any[];
+  const totalValue: number = portfolioContext.totalValue || 0;
+  const change24h = positions.reduce((s: number, p: any) => s + (p.valueUSD * p.change24h / 100), 0);
+  const change24hPct = totalValue > 0 ? (change24h / totalValue) * 100 : 0;
+
+  const sorted = [...positions].sort((a, b) => (a.valueUSD * a.change24h / 100) - (b.valueUSD * b.change24h / 100));
+  const worst = sorted[0];
+  const best = sorted[sorted.length - 1];
+
+  let context = '';
+  if (mood === 'thriving') {
+    context = `You are up $${Math.abs(change24h).toFixed(0)} (${Math.abs(change24hPct).toFixed(1)}%) today.`
+      + (best ? ` ${best.tokenSymbol} is your star performer.` : '');
+  } else if (mood === 'stable') {
+    context = `Portfolio is flat — ${change24hPct >= 0 ? '+' : ''}${change24hPct.toFixed(1)}% today. Nothing dramatic.`;
+  } else if (mood === 'worried') {
+    context = `You are down $${Math.abs(change24h).toFixed(0)} (${Math.abs(change24hPct).toFixed(1)}%) today.`
+      + (worst ? ` ${worst.tokenSymbol} is dragging things down.` : '');
+  } else {
+    context = `You are down $${Math.abs(change24h).toFixed(0)} (${Math.abs(change24hPct).toFixed(1)}%) today — it hurts.`
+      + (worst ? ` ${worst.tokenSymbol} is your worst performer right now.` : '');
+  }
+
+  return `Say the following in a ${base} voice. Context for your emotional state: ${context} Now say: `;
+}
 
 export interface TTSResult {
   audio: Buffer;
   contentType: string;
 }
 
-export async function synthesizeGoogleTTS(text: string, mood?: Mood): Promise<TTSResult | null> {
+export async function synthesizeGoogleTTS(text: string, mood?: Mood, portfolioContext?: any): Promise<TTSResult | null> {
   const key = process.env.GOOGLE_TTS_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY;
   if (!key) return null;
 
   const voiceName = mood ? MOOD_VOICE[mood] : (process.env.GOOGLE_TTS_VOICE || 'Kore');
-  const styledText = mood ? MOOD_STYLE[mood] + text : text;
+  const styledText = mood ? buildMoodStyle(mood, portfolioContext) + text : text;
   const model = 'gemini-2.5-flash-preview-tts';
 
   const response = await fetch(

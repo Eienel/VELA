@@ -63,11 +63,11 @@ export async function fetchPortfolio(address: string, chainType: 'evm' | 'solana
   return res.json();
 }
 
-export async function fetchVoice(text: string, mood: Mood): Promise<Response> {
+export async function fetchVoice(text: string, mood: Mood, portfolioContext?: any): Promise<Response> {
   return fetch(`${API_BASE}/api/voice`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, mood }),
+    body: JSON.stringify({ text, mood, portfolioContext }),
   });
 }
 

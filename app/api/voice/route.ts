@@ -3,15 +3,15 @@ import { synthesizeGoogleTTS, Mood } from '@/lib/google-tts';
 import { streamVoice } from '@/lib/elevenlabs';
 
 export async function POST(req: NextRequest) {
-  const { text, mood } = await req.json();
+  const { text, mood, portfolioContext } = await req.json();
 
   if (!text || typeof text !== 'string') {
     return NextResponse.json({ error: 'No text provided' }, { status: 400 });
   }
 
-  // 1) Primary: Gemini TTS with mood-styled voice
+  // 1) Primary: Gemini TTS — personalized style prompt from real portfolio numbers
   try {
-    const result = await synthesizeGoogleTTS(text, mood as Mood | undefined);
+    const result = await synthesizeGoogleTTS(text, mood as Mood | undefined, portfolioContext);
     if (result) {
       return new Response(new Uint8Array(result.audio), {
         headers: {
@@ -36,6 +36,5 @@ export async function POST(req: NextRequest) {
     console.error('ElevenLabs failed:', error);
   }
 
-  // 3) Signal client to use browser SpeechSynthesis
   return NextResponse.json({ error: 'TTS unavailable' }, { status: 503 });
 }

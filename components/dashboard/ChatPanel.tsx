@@ -91,7 +91,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       const response = await fetch('/api/voice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mood }),
+        body: JSON.stringify({ text, mood, portfolioContext: portfolioData }),
       });
       if (!response.ok) { speakWithBrowser(id, text); return; }
       const blob = await response.blob();
