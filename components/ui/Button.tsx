@@ -1,25 +1,25 @@
 'use client';
-import { motion } from 'framer-motion';
 
 interface Props {
   children: React.ReactNode;
   onClick?: () => void;
   variant?: 'primary' | 'secondary';
   className?: string;
+  disabled?: boolean;
 }
 
-export default function Button({ children, onClick, variant = 'primary', className = '' }: Props) {
+export default function Button({ children, onClick, variant = 'primary', className = '', disabled = false }: Props) {
   return (
-    <motion.button
-      whileTap={{ scale: 0.97 }}
+    <button
       onClick={onClick}
-      className={`px-6 py-3 rounded-lg font-semibold text-sm transition-colors ${
+      disabled={disabled}
+      className={`px-6 py-3 rounded-none font-semibold text-sm transition-transform active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 ${
         variant === 'primary'
           ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950'
-          : 'bg-zinc-800 hover:bg-zinc-700 text-zinc-200'
+          : 'border border-zinc-700 bg-transparent text-zinc-300 hover:border-zinc-500'
       } ${className}`}
     >
       {children}
-    </motion.button>
+    </button>
   );
 }

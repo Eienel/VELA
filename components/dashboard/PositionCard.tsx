@@ -37,16 +37,16 @@ export default function PositionCard({ symbol, value, change, allocation }: Prop
   const sparkline = useMemo(() => generateSparkline(change, seed), [change, seed]);
 
   return (
-    <div className="flex items-center justify-between py-2.5 border-b border-zinc-800/60 last:border-0 group">
+    <div className="flex items-center justify-between py-2.5 border-b border-zinc-800 last:border-0 group">
       <div className="flex items-center gap-2.5">
         <div
-          className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: `${color}18`, border: `1px solid ${color}30` }}
+          className="w-7 h-7 rounded-none flex items-center justify-center flex-shrink-0"
+          style={{ background: `${color}14`, border: `1px solid ${color}40` }}
         >
-          <span className="text-[10px] font-bold" style={{ color }}>{symbol.slice(0, 3)}</span>
+          <span className="text-[10px] font-bold font-mono" style={{ color }}>{symbol.slice(0, 3)}</span>
         </div>
         <div>
-          <div className="text-sm font-medium text-zinc-200 leading-none">{symbol}</div>
+          <div className="text-sm font-mono text-zinc-200 leading-none">{symbol}</div>
           {allocation !== undefined && (
             <div className="text-[10px] font-mono text-zinc-600 mt-0.5">{allocation.toFixed(1)}%</div>
           )}
@@ -58,9 +58,9 @@ export default function PositionCard({ symbol, value, change, allocation }: Prop
             points={sparkline}
             fill="none"
             stroke={isPositive ? '#22c55e' : '#ef4444'}
-            strokeWidth={3}
-            strokeLinecap="round"
-            strokeLinejoin="round"
+            strokeWidth={2}
+            strokeLinecap="butt"
+            strokeLinejoin="miter"
           />
         </svg>
         <div className="text-right min-w-[72px]">

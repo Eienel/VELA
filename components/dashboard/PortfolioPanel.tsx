@@ -37,7 +37,7 @@ export default function PortfolioPanel({ address, chainType }: Props) {
 
   if (loading) {
     return (
-      <div className="p-5 space-y-4 animate-pulse bg-zinc-950 border-l border-zinc-800">
+      <div className="p-5 space-y-4 animate-pulse bg-[#070708] border-l border-zinc-800">
         <div className="h-3 bg-zinc-800 rounded w-24" />
         <div className="h-10 bg-zinc-800 rounded w-32" />
         {[1,2,3].map(i => <div key={i} className="h-12 bg-zinc-800 rounded" />)}
@@ -46,11 +46,11 @@ export default function PortfolioPanel({ address, chainType }: Props) {
   }
 
   return (
-    <div className="bg-zinc-950 border-l border-zinc-800 overflow-y-auto flex flex-col">
+    <div className="bg-[#070708] border-l border-zinc-800 overflow-y-auto flex flex-col">
       {/* Header */}
-      <div className="p-5 pb-4 border-b border-zinc-800/60">
-        <div className="text-xs uppercase tracking-widest text-zinc-600 mb-2">Portfolio Snapshot</div>
-        <div className="font-mono text-4xl text-zinc-50 font-semibold tracking-tight leading-none">
+      <div className="p-5 pb-4 border-b border-zinc-800">
+        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-2">Portfolio Snapshot</div>
+        <div className="font-display text-4xl text-zinc-50 font-bold tracking-tight leading-none">
           ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
         <div className={`font-mono text-sm mt-2 ${change30d >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -66,8 +66,8 @@ export default function PortfolioPanel({ address, chainType }: Props) {
       ) : (
         <>
           {/* Top positions */}
-          <div className="p-5 pb-3 border-b border-zinc-800/60">
-            <div className="text-xs uppercase tracking-widest text-zinc-600 mb-3">Top Positions</div>
+          <div className="p-5 pb-3 border-b border-zinc-800">
+            <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-3">Top Positions</div>
             <div>
               {[...positions].sort((a, b) => b.valueUSD - a.valueUSD).slice(0, 5).map((p, i) => (
                 <motion.div
@@ -89,7 +89,7 @@ export default function PortfolioPanel({ address, chainType }: Props) {
 
           {/* Chain exposure */}
           <div className="p-5">
-            <div className="text-xs uppercase tracking-widest text-zinc-600 mb-3">Chain Exposure</div>
+            <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-3">Chain Exposure</div>
             <div className="space-y-2.5">
               {Object.entries(chainExposure)
                 .sort(([, a], [, b]) => b - a)
@@ -98,15 +98,15 @@ export default function PortfolioPanel({ address, chainType }: Props) {
                   return (
                     <div key={chain}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-zinc-400 capitalize">{chain}</span>
+                        <span className="text-zinc-400 capitalize font-mono">{chain}</span>
                         <span className="font-mono text-zinc-500">{pct.toFixed(0)}%</span>
                       </div>
-                      <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
+                      <div className="h-1.5 bg-zinc-800 rounded-none overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${pct}%` }}
-                          transition={{ duration: 0.5, ease: 'easeOut' }}
-                          className="h-full bg-zinc-600 rounded-full"
+                          transition={{ duration: 0.4, ease: [0.2, 0.8, 0.2, 1] }}
+                          className="h-full bg-zinc-600 rounded-none"
                         />
                       </div>
                     </div>

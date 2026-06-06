@@ -55,7 +55,7 @@ export default function ConnectWallet({ onConnect }: Props) {
       <button
         onClick={connectEVM}
         disabled={connecting}
-        className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold rounded-lg transition-colors disabled:opacity-50"
+        className="flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 hover:bg-amber-400 text-zinc-950 font-mono text-xs uppercase tracking-widest rounded-none transition-transform active:scale-[0.98] disabled:opacity-50"
       >
         <Wallet size={18} weight="fill" />
         {connecting ? 'Connecting...' : 'Connect EVM Wallet'}
@@ -63,18 +63,18 @@ export default function ConnectWallet({ onConnect }: Props) {
       <button
         onClick={connectSolana}
         disabled={connecting}
-        className="flex items-center justify-center gap-2 px-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-medium rounded-lg transition-colors disabled:opacity-50"
+        className="flex items-center justify-center gap-2 px-6 py-3 border border-zinc-700 bg-transparent text-zinc-300 font-mono text-xs uppercase tracking-widest rounded-none transition-transform active:scale-[0.98] hover:border-zinc-500 disabled:opacity-50"
       >
         <Wallet size={18} />
         Connect Solana Wallet
       </button>
       <button
         onClick={useDemoWallet}
-        className="text-xs text-zinc-600 hover:text-zinc-400 transition-colors text-center py-2 border border-zinc-800 rounded-lg hover:border-zinc-700 w-full"
+        className="text-[10px] font-mono uppercase tracking-widest text-zinc-600 hover:text-zinc-400 transition-colors text-center py-2 border border-zinc-800 rounded-none hover:border-zinc-700 w-full"
       >
         Use demo wallet instead
       </button>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs text-red-500 font-mono">{error}</p>}
     </div>
   );
 }

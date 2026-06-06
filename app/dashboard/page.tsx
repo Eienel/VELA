@@ -49,8 +49,8 @@ export default function Dashboard() {
 
   if (!address) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center gap-8">
-        <h2 className="text-2xl font-semibold tracking-tighter text-zinc-50">Connect your wallet to start</h2>
+      <div className="min-h-screen bg-[#070708] flex flex-col items-center justify-center gap-8">
+        <h2 className="font-display text-3xl font-bold tracking-tighter text-zinc-50">Connect your wallet to start</h2>
         <ConnectWallet onConnect={handleConnect} />
       </div>
     );

@@ -138,7 +138,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#0c0c0e]">
+    <div className="flex flex-col h-full bg-[#070708]">
       {/* Mascot header */}
       <div className="flex flex-col items-center pt-4 pb-4 border-b border-zinc-800">
         <VelaMascot
@@ -146,20 +146,21 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
           thinking={isLoading && reasoningStep < 3}
           speaking={!!playingId}
         />
-        <div className="text-xs text-zinc-600 mt-2 uppercase tracking-widest">Ask Vela</div>
+        <div className="text-[10px] text-zinc-600 mt-2 uppercase tracking-[0.25em] font-mono">Vela / Ready</div>
       </div>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-6 py-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-start gap-3 text-zinc-600 text-sm mt-8">
-            <p className="text-zinc-400">Your portfolio is loaded. Ask me anything.</p>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <p className="font-display text-2xl font-bold tracking-tight text-zinc-300 leading-tight">Ask anything about<br />your positions.</p>
+            <p className="text-[10px] text-zinc-600 uppercase tracking-[0.2em] font-mono">Portfolio loaded / Ready</p>
+            <div className="flex flex-wrap gap-2 mt-3">
               {suggestedQuestions.map(q => (
                 <button
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="text-xs px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 hover:border-zinc-700 transition-colors"
+                  className="font-mono text-xs px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-none text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 hover:border-zinc-600 transition-colors"
                 >
                   {q}
                 </button>
@@ -194,7 +195,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
       {/* Input */}
       <div className="px-4 py-3 border-t border-zinc-800">
-        <form onSubmit={onSubmit} className="flex items-center gap-2 bg-zinc-900/60 border border-zinc-800 rounded-xl px-3 py-1.5">
+        <form onSubmit={onSubmit} className="flex items-center gap-2 bg-zinc-900/40 border border-zinc-800 rounded-none px-3 py-1.5">
           <VoiceButton onTranscript={handleVoiceTranscript} disabled={isLoading} />
           <input
             value={inputValue}
@@ -206,7 +207,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-400 transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-none bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-400 transition-transform active:scale-[0.98]"
           >
             <ArrowUp size={16} color="#09090b" weight="bold" />
           </button>

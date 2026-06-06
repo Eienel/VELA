@@ -34,7 +34,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
         transition={{ duration: 0.2 }}
         className="flex justify-end mb-5"
       >
-        <div className="max-w-[72%] bg-zinc-800/80 border border-zinc-700/50 rounded-2xl rounded-tr-sm px-4 py-2.5 text-sm text-zinc-100 leading-relaxed">
+        <div className="max-w-[72%] bg-zinc-900 border border-zinc-700 rounded-none px-4 py-2.5 text-sm text-zinc-100 leading-relaxed">
           {content}
         </div>
       </motion.div>
@@ -48,7 +48,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
       transition={{ duration: 0.2 }}
       className="flex gap-3 mb-5"
     >
-      <div className="flex-1 border-l-2 border-amber-500/25 pl-3">
+      <div className="flex-1 border-l border-amber-500/40 pl-3">
         <div className="text-sm text-zinc-200 leading-relaxed">
           <HighlightedText text={content} />
         </div>
@@ -61,7 +61,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
                 key={i}
                 animate={{ scaleY: [0.3, 1, 0.3] }}
                 transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                className="w-0.5 bg-amber-500 rounded-full origin-bottom"
+                className="w-0.5 bg-amber-500 rounded-none origin-bottom"
                 style={{ height: '100%' }}
               />
             ))}

@@ -20,6 +20,7 @@ const config: Config = {
       fontFamily: {
         sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"Helvetica Neue"', 'system-ui', 'sans-serif'],
         mono: ['"SF Mono"', 'ui-monospace', '"Cascadia Code"', '"Fira Code"', 'monospace'],
+        display: ['var(--font-display)', 'system-ui', 'sans-serif'],
       },
     },
   },

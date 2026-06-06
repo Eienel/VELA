@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --bg: #09090b;
+  --bg: #070708;
   --surface: #18181b;
   --border: #27272a;
   --muted: #71717a;
@@ -44,6 +44,10 @@ body {
 
 .mono {
   font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
+}
+
+.font-display {
+  font-family: var(--font-display), system-ui, sans-serif;
 }
 
 @layer utilities {

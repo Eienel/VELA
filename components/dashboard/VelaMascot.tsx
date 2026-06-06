@@ -27,24 +27,24 @@ export default function VelaMascot({ size = 48, thinking = false, speaking = fal
     return path + 'Z';
   };
 
+  const ringR = center - 2;
+  const circ = 2 * Math.PI * ringR;
+
   return (
-    <motion.div
-      animate={{ y: [0, -8, 0] }}
-      transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-      style={{ display: 'inline-block' }}
-    >
+    <div style={{ display: 'inline-block' }}>
       <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-        {/* Orbital ring */}
+        {/* Orbital ring — partial arc, rotates only when thinking */}
         <motion.circle
           cx={center}
           cy={center}
-          r={center - 2}
+          r={ringR}
           stroke="#f59e0b"
           strokeOpacity={0.4}
           strokeWidth={1.5}
           fill="none"
-          animate={thinking ? { rotate: 360 } : {}}
-          transition={thinking ? { duration: 2, repeat: Infinity, ease: 'linear' } : {}}
+          strokeDasharray={`${circ * 0.7} ${circ * 0.3}`}
+          animate={thinking ? { rotate: 360 } : { rotate: 0 }}
+          transition={thinking ? { duration: 1.6, repeat: Infinity, ease: 'linear' } : { duration: 0.4 }}
           style={{ transformOrigin: `${center}px ${center}px` }}
         />
         {/* Star body */}
@@ -59,6 +59,6 @@ export default function VelaMascot({ size = 48, thinking = false, speaking = fal
         <rect x={center - 5} y={center - 7} width={3} height={4} rx={1} fill="#09090b" />
         <rect x={center + 2} y={center - 7} width={3} height={4} rx={1} fill="#09090b" />
       </svg>
-    </motion.div>
+    </div>
   );
 }

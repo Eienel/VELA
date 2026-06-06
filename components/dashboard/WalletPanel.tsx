@@ -38,7 +38,7 @@ export default function WalletPanel({ address, chainType }: Props) {
 
   if (loading) {
     return (
-      <div className="p-5 space-y-4 animate-pulse bg-zinc-950 border-r border-zinc-800">
+      <div className="p-5 space-y-4 animate-pulse bg-[#070708] border-r border-zinc-800">
         <div className="h-3 bg-zinc-800 rounded w-16" />
         <div className="h-10 bg-zinc-800 rounded w-36" />
         <div className="h-4 bg-zinc-800 rounded w-24" />
@@ -49,22 +49,22 @@ export default function WalletPanel({ address, chainType }: Props) {
   }
 
   return (
-    <div className="bg-zinc-950 border-r border-zinc-800 overflow-y-auto flex flex-col">
+    <div className="bg-[#070708] border-r border-zinc-800 overflow-y-auto flex flex-col">
       {/* Wallet header */}
-      <div className="p-5 pb-4 border-b border-zinc-800/60">
-        <div className="text-xs uppercase tracking-widest text-zinc-600 mb-2">Wallet</div>
+      <div className="p-5 pb-4 border-b border-zinc-800">
+        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-2">Wallet</div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-xs text-zinc-400">{address.slice(0, 6)}...{address.slice(-4)}</span>
-          <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono uppercase tracking-wider ${chainType === 'solana' ? 'bg-violet-500/10 text-violet-400' : 'bg-amber-500/10 text-amber-500'}`}>
+          <span className={`text-[10px] px-1.5 py-0.5 rounded-none font-mono uppercase tracking-wider ${chainType === 'solana' ? 'bg-violet-500/10 text-violet-400' : 'bg-amber-500/10 text-amber-500'}`}>
             {chainType === 'solana' ? 'SOL' : 'ETH'}
           </span>
         </div>
       </div>
 
       {/* Total value */}
-      <div className="p-5 pb-4 border-b border-zinc-800/60">
-        <div className="text-xs uppercase tracking-widest text-zinc-600 mb-2">Total Value</div>
-        <div className="font-mono text-4xl text-zinc-50 font-semibold tracking-tight leading-none">
+      <div className="p-5 pb-4 border-b border-zinc-800">
+        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-2">Total Value</div>
+        <div className="font-display text-4xl text-zinc-50 font-bold tracking-tight leading-none">
           ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
         <div className={`font-mono text-sm mt-2 ${change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -81,8 +81,8 @@ export default function WalletPanel({ address, chainType }: Props) {
 
       {/* Allocation */}
       <div className="p-5 flex-1">
-        <div className="text-xs uppercase tracking-widest text-zinc-600 mb-4">
-          Allocation <span className="text-zinc-700 normal-case tracking-normal ml-1">({positions.length} positions)</span>
+        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-4">
+          Allocation <span className="text-zinc-700 ml-1">/ {positions.length}</span>
         </div>
         {positions.length === 0 ? (
           <p className="text-xs text-zinc-700 leading-relaxed">
@@ -98,19 +98,15 @@ export default function WalletPanel({ address, chainType }: Props) {
                 transition={{ delay: i * 0.06 }}
               >
                 <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-zinc-400 font-medium">{item.symbol}</span>
+                  <span className="text-zinc-400 font-mono">{item.symbol}</span>
                   <span className="font-mono text-zinc-500">{item.pct.toFixed(1)}%</span>
                 </div>
-                <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                <div className="h-1.5 bg-zinc-800 rounded-none overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${item.pct}%` }}
-                    transition={{ duration: 0.6, delay: i * 0.08, ease: 'easeOut' }}
-                    className="h-full rounded-full"
-                    style={{
-                      background: `linear-gradient(90deg, #f59e0b, #fbbf24)`,
-                      boxShadow: '0 0 8px rgba(245,158,11,0.4)',
-                    }}
+                    transition={{ duration: 0.4, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
+                    className={`h-full rounded-none ${i === 0 ? 'bg-amber-500' : 'bg-zinc-600'}`}
                   />
                 </div>
               </motion.div>

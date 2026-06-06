@@ -24,7 +24,7 @@ function MarqueeRow({ items, reverse = false }: { items: string[]; reverse?: boo
         {doubled.map((q, i) => (
           <div
             key={i}
-            className="flex-shrink-0 px-4 py-2 border border-zinc-800 hover:border-zinc-700 rounded-full text-sm text-zinc-500 hover:text-zinc-400 transition-colors cursor-default whitespace-nowrap"
+            className="flex-shrink-0 px-4 py-2 border border-zinc-800 hover:border-zinc-600 rounded-none font-mono text-xs text-zinc-500 hover:text-zinc-400 transition-colors cursor-default whitespace-nowrap"
           >
             {q}
           </div>
@@ -36,9 +36,9 @@ function MarqueeRow({ items, reverse = false }: { items: string[]; reverse?: boo
 
 export default function QueryCarousel() {
   return (
-    <section className="py-16 border-t border-zinc-800/50 space-y-3">
-      <div className="text-xs uppercase tracking-widest text-zinc-500 mb-8 px-8 md:px-16 max-w-7xl mx-auto">
-        Ask anything
+    <section className="py-16 border-t border-zinc-800 space-y-3">
+      <div className="text-[10px] tracking-[0.2em] text-zinc-600 font-mono uppercase mb-8 px-8 md:px-16 max-w-7xl mx-auto">
+        02 / Ask Anything
       </div>
       <MarqueeRow items={row1} />
       <MarqueeRow items={row2} reverse />
