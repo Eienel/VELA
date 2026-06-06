@@ -14,7 +14,7 @@ export async function GET(
     if (chain === 'solana') {
       positions = await getSolanaPortfolio(address);
     } else {
-      positions = await getEVMPortfolio(address);
+      positions = await getEVMPortfolio(address, chain as 'ethereum' | 'base' | 'arbitrum');
     }
 
     await upsertPositions(address, positions);

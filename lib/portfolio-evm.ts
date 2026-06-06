@@ -1,8 +1,119 @@
 import { Position } from '@/types';
 
 // Mock data for demo - in production would use Alchemy/Ankr RPC
-export async function getEVMPortfolio(address: string): Promise<Position[]> {
+export async function getEVMPortfolio(
+  address: string,
+  chain: 'ethereum' | 'base' | 'arbitrum' = 'ethereum'
+): Promise<Position[]> {
   const now = new Date();
+
+  if (chain === 'base') {
+    return [
+      {
+        walletAddress: address,
+        tokenSymbol: 'ETH',
+        tokenAddress: '0x0000000000000000000000000000000000000000',
+        balance: 5.21,
+        valueUSD: 9206,
+        chain: 'base',
+        chainType: 'evm',
+        priceUSD: 1767.0,
+        change24h: 3.8,
+        change30d: 7.4,
+        costBasisUSD: 8500,
+        unrealizedPnL: 706,
+        correlationToETH: 1.0,
+        updatedAt: now,
+      },
+      {
+        walletAddress: address,
+        tokenSymbol: 'USDC',
+        tokenAddress: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+        balance: 4200,
+        valueUSD: 4200,
+        chain: 'base',
+        chainType: 'evm',
+        priceUSD: 1.0,
+        change24h: 0,
+        change30d: 0,
+        costBasisUSD: 4200,
+        unrealizedPnL: 0,
+        correlationToETH: 0.0,
+        updatedAt: now,
+      },
+      {
+        walletAddress: address,
+        tokenSymbol: 'AERO',
+        tokenAddress: '0x940181a94A35A4569E4529A3CDfB74e38FD98631',
+        balance: 12000,
+        valueUSD: 2160,
+        chain: 'base',
+        chainType: 'evm',
+        priceUSD: 0.18,
+        change24h: -5.2,
+        change30d: -22.1,
+        costBasisUSD: 3000,
+        unrealizedPnL: -840,
+        correlationToETH: 0.72,
+        updatedAt: now,
+      },
+    ];
+  }
+
+  if (chain === 'arbitrum') {
+    return [
+      {
+        walletAddress: address,
+        tokenSymbol: 'ARB',
+        tokenAddress: '0x912CE59144191C1204E64559FE8253a0e49E6548',
+        balance: 18420,
+        valueUSD: 10875,
+        chain: 'arbitrum',
+        chainType: 'evm',
+        priceUSD: 0.59,
+        change24h: -3.1,
+        change30d: -18.3,
+        costBasisUSD: 11722,
+        unrealizedPnL: -847,
+        correlationToETH: 0.87,
+        updatedAt: now,
+      },
+      {
+        walletAddress: address,
+        tokenSymbol: 'ETH',
+        tokenAddress: '0x0000000000000000000000000000000000000000',
+        balance: 3.5,
+        valueUSD: 6183,
+        chain: 'arbitrum',
+        chainType: 'evm',
+        priceUSD: 1767.0,
+        change24h: 4.1,
+        change30d: 8.2,
+        costBasisUSD: 5800,
+        unrealizedPnL: 383,
+        correlationToETH: 1.0,
+        updatedAt: now,
+      },
+      {
+        walletAddress: address,
+        tokenSymbol: 'USDC',
+        tokenAddress: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8',
+        balance: 3500,
+        valueUSD: 3500,
+        chain: 'arbitrum',
+        chainType: 'evm',
+        priceUSD: 1.0,
+        change24h: 0,
+        change30d: 0,
+        costBasisUSD: 3500,
+        unrealizedPnL: 0,
+        correlationToETH: 0.0,
+        updatedAt: now,
+      },
+    ];
+  }
+
+  // Default: Ethereum
   return [
     {
       walletAddress: address,
