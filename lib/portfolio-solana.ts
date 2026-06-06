@@ -4,11 +4,15 @@ import { getTokenPrices, getNativePrice } from '@/lib/prices';
 // Minimum USD value for a token to show — filters airdropped spam/dust.
 const MIN_TOKEN_USD = 1;
 
-function heliusUrl(): string | null {
-  // Prefer an explicit RPC URL, else build one from the API key.
+function solanaRpcUrl(): string | null {
+  // Prefer an explicit Helius RPC URL or key, else fall back to Alchemy's
+  // Solana endpoint (the same ALCHEMY_API_KEY works — getBalance and
+  // getTokenAccountsByOwner are standard Solana JSON-RPC methods).
   if (process.env.HELIUS_RPC_URL) return process.env.HELIUS_RPC_URL;
   if (process.env.HELIUS_API_KEY)
     return `https://mainnet.helius-rpc.com/?api-key=${process.env.HELIUS_API_KEY}`;
+  if (process.env.ALCHEMY_API_KEY)
+    return `https://solana-mainnet.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`;
   return null;
 }
 
@@ -18,20 +22,20 @@ async function rpc(url: string, method: string, params: any): Promise<any> {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id: 'vela', method, params }),
   });
-  if (!res.ok) throw new Error(`Helius ${method} failed: ${res.status}`);
+  if (!res.ok) throw new Error(`Solana RPC ${method} failed: ${res.status}`);
   const json = await res.json();
-  if (json.error) throw new Error(`Helius ${method}: ${json.error.message}`);
+  if (json.error) throw new Error(`Solana RPC ${method}: ${json.error.message}`);
   return json.result;
 }
 
 const TOKEN_PROGRAM = 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA';
 const WRAPPED_SOL = 'So11111111111111111111111111111111111111112';
 
-// Read native SOL + every SPL token a wallet holds via Helius, price each
-// through CoinGecko, and drop anything below MIN_TOKEN_USD (spam filter).
+// Read native SOL + every SPL token a wallet holds (via Helius or Alchemy),
+// price each through CoinGecko, and drop anything below MIN_TOKEN_USD (spam).
 async function getRealSolanaPortfolio(address: string): Promise<Position[]> {
-  const url = heliusUrl();
-  if (!url) throw new Error('No Helius config');
+  const url = solanaRpcUrl();
+  if (!url) throw new Error('No Solana RPC config');
   const now = new Date();
 
   const [lamports, tokenAccounts] = await Promise.all([
@@ -111,7 +115,7 @@ async function getRealSolanaPortfolio(address: string): Promise<Position[]> {
 
 // Entry point: try real read, fall back to demo data on missing config/error.
 export async function getSolanaPortfolio(address: string): Promise<Position[]> {
-  if (heliusUrl()) {
+  if (solanaRpcUrl()) {
     try {
       const real = await getRealSolanaPortfolio(address);
       if (real.length > 0) return real;
