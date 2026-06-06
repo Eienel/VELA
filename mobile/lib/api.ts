@@ -1,6 +1,6 @@
 // Point to your deployed Vercel URL in production
 // For local dev, use your machine's local IP: http://192.168.x.x:3000
-export const API_BASE = 'https://vela-five-virid.vercel.app';
+export const API_BASE = 'https://vela-one-sandy.vercel.app';
 
 export interface Position {
   tokenSymbol: string;
