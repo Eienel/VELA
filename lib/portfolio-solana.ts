@@ -113,12 +113,13 @@ async function getRealSolanaPortfolio(address: string): Promise<Position[]> {
   return positions.sort((a, b) => b.valueUSD - a.valueUSD);
 }
 
-// Entry point: try real read, fall back to demo data on missing config/error.
+// Entry point: when a Solana RPC is configured we return the real read as-is —
+// including an empty list for an empty wallet. Demo data is only used when no
+// RPC is configured or the call throws.
 export async function getSolanaPortfolio(address: string): Promise<Position[]> {
   if (solanaRpcUrl()) {
     try {
-      const real = await getRealSolanaPortfolio(address);
-      if (real.length > 0) return real;
+      return await getRealSolanaPortfolio(address);
     } catch (e) {
       console.error('Solana real read failed, using demo data:', e);
     }

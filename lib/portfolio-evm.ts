@@ -129,16 +129,16 @@ async function getRealEVMPortfolio(address: string, chain: EVMChain): Promise<Po
   return positions.sort((a, b) => b.valueUSD - a.valueUSD);
 }
 
-// Entry point: try real on-chain read, fall back to demo data when no API
-// key is configured or the providers error out.
+// Entry point: when an API key is configured we return the real read as-is —
+// including an empty list for a genuinely empty wallet. Demo data is only used
+// when no key is configured or the provider call throws.
 export async function getEVMPortfolio(
   address: string,
   chain: EVMChain = 'ethereum'
 ): Promise<Position[]> {
   if (process.env.ALCHEMY_API_KEY) {
     try {
-      const real = await getRealEVMPortfolio(address, chain);
-      if (real.length > 0) return real;
+      return await getRealEVMPortfolio(address, chain);
     } catch (e) {
       console.error('EVM real read failed, using demo data:', e);
     }
