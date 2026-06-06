@@ -107,7 +107,7 @@ export default function WalletPanel({ address, chainType }: Props) {
                     initial={{ width: 0 }}
                     animate={{ width: `${item.pct}%` }}
                     transition={{ duration: 0.5, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
-                    className={`h-full rounded-full ${i === 0 ? 'bg-[#1D1D1F]' : 'bg-[#D2D2D7]'}`}
+                    className={`h-full rounded-full ${i === 0 ? 'bg-[#3056D7]' : 'bg-[#D2D2D7]'}`}
                   />
                 </div>
               </motion.div>

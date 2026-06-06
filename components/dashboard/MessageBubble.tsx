@@ -15,7 +15,7 @@ function HighlightedText({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         /^\$[\d,]+\.?\d*$|^[\d,]+\.?\d*%$|^\d+\.?\d*[xX]$/.test(part) ? (
-          <span key={i} className="font-mono text-[#1D1D1F] font-medium">{part}</span>
+          <span key={i} className="font-mono text-[#3056D7] font-medium">{part}</span>
         ) : (
           <span key={i}>{part}</span>
         )

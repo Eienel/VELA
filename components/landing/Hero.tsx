@@ -8,15 +8,15 @@ import { useRouter } from 'next/navigation';
 const demos = [
   {
     user: 'If ETH drops 30%, what happens?',
-    vela: <>Portfolio drops roughly <span className="font-mono font-semibold text-[#1D1D1F]">$14,200</span>. ARB takes the hardest hit — <span className="font-mono font-semibold text-[#1D1D1F]">87%</span> correlated to ETH.</>,
+    vela: <>Portfolio drops roughly <span className="font-mono font-semibold text-[#3056D7]">$14,200</span>. ARB takes the hardest hit — <span className="font-mono font-semibold text-[#3056D7]">87%</span> correlated to ETH.</>,
   },
   {
     user: 'How concentrated am I?',
-    vela: <>Top 3 positions make up <span className="font-mono font-semibold text-[#1D1D1F]">73%</span> of your value. ETH at <span className="font-mono font-semibold text-[#1D1D1F]">48%</span>, ARB at <span className="font-mono font-semibold text-[#1D1D1F]">23%</span>.</>,
+    vela: <>Top 3 positions make up <span className="font-mono font-semibold text-[#3056D7]">73%</span> of your value. ETH at <span className="font-mono font-semibold text-[#3056D7]">48%</span>, ARB at <span className="font-mono font-semibold text-[#3056D7]">23%</span>.</>,
   },
   {
     user: "What's my worst position right now?",
-    vela: <>ARB is down <span className="font-mono font-semibold text-[#1D1D1F]">18.3%</span> since entry — <span className="font-mono font-semibold text-[#1D1D1F]">$847</span> in the red. Your highest-risk hold.</>,
+    vela: <>ARB is down <span className="font-mono font-semibold text-[#3056D7]">18.3%</span> since entry — <span className="font-mono font-semibold text-[#3056D7]">$847</span> in the red. Your highest-risk hold.</>,
   },
 ];
 
@@ -49,12 +49,12 @@ export default function Hero() {
           <div className="flex items-center gap-2.5">
             <VelaMascot size={26} />
             <span className="font-semibold text-[#1D1D1F] text-[15px] tracking-tight">
-              Vela<span className="text-[#AEAEB2]">.</span>
+              Vela<span className="text-[#3056D7]">.</span>
             </span>
           </div>
           <button
             onClick={() => setShowConnect(true)}
-            className="text-[13px] font-semibold text-[#1D1D1F] hover:text-[#1D1D1F] transition-colors"
+            className="text-[13px] font-semibold text-[#1D1D1F] hover:text-[#3056D7] transition-colors"
           >
             Get started →
           </button>
@@ -70,8 +70,9 @@ export default function Hero() {
             Portfolio Intelligence · EVM + Solana
           </p>
 
-          <h1 className="text-[60px] md:text-[72px] font-bold tracking-[-0.04em] leading-[1.0] text-[#1D1D1F] mb-6">
-            Your wallet<br />has feelings.
+          <h1 className="text-[60px] md:text-[72px] font-bold tracking-[-0.04em] leading-[1.0] mb-6">
+            <span className="text-[#1D1D1F]">Your wallet,</span><br />
+            <span className="text-[#B0B0B5]">answering back.</span>
           </h1>
 
           <p className="text-[17px] text-[#6E6E73] leading-relaxed max-w-[400px] mb-10">
@@ -155,7 +156,7 @@ export default function Hero() {
           <div className="px-4 pb-4 bg-white">
             <div className="flex items-center gap-2 bg-[#F5F5F7] border border-[#E8E8ED] rounded-full px-4 py-2.5">
               <span className="text-[13px] text-[#AEAEB2] flex-1">Ask your wallet anything...</span>
-              <div className="w-7 h-7 rounded-full bg-[#1D1D1F] flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-[#3056D7] flex items-center justify-center">
                 <span className="text-white text-[13px] font-bold leading-none">↑</span>
               </div>
             </div>
