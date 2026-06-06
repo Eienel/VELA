@@ -13,10 +13,10 @@ export default function TechStack() {
       <div className="flex flex-wrap gap-3">
         {techs.map(t => (
           <div key={t.label}
-            className={`flex flex-col px-4 py-3 bg-white border rounded-xl ${t.highlight ? 'border-[#FF9500]/30 bg-[#FFF7ED]' : 'border-[#E8E8ED]'}`}
+            className={`flex flex-col px-4 py-3 bg-white border rounded-xl ${t.highlight ? 'border-[#1D1D1F]/30 bg-[#FFF7ED]' : 'border-[#E8E8ED]'}`}
             style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
           >
-            <span className={`text-[13px] font-semibold ${t.highlight ? 'text-[#FF9500]' : 'text-[#1D1D1F]'}`}>{t.label}</span>
+            <span className={`text-[13px] font-semibold ${t.highlight ? 'text-[#1D1D1F]' : 'text-[#1D1D1F]'}`}>{t.label}</span>
             <span className="font-mono text-[11px] text-[#AEAEB2] mt-0.5">{t.desc}</span>
           </div>
         ))}

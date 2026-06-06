@@ -23,7 +23,7 @@ export default function HowItWorks() {
               className="bg-white border border-[#E8E8ED] rounded-2xl p-6"
               style={{ boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
             >
-              <div className={`inline-flex w-8 h-8 rounded-xl items-center justify-center mb-5 ${i === 0 ? 'bg-[#FFF7ED] text-[#FF9500]' : 'bg-[#F5F5F7] text-[#AEAEB2]'}`}>
+              <div className={`inline-flex w-8 h-8 rounded-xl items-center justify-center mb-5 ${i === 0 ? 'bg-[#FFF7ED] text-[#1D1D1F]' : 'bg-[#F5F5F7] text-[#AEAEB2]'}`}>
                 <span className="font-mono text-[11px] font-semibold">{s.n}</span>
               </div>
               <h3 className="text-[16px] font-semibold text-[#1D1D1F] mb-2 tracking-tight">{s.title}</h3>

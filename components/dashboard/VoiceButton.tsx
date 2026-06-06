@@ -60,11 +60,11 @@ export default function VoiceButton({ onTranscript, disabled }: Props) {
         <motion.div
           animate={{ scale: [1, 1.5, 1], opacity: [0.6, 0, 0.6] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="absolute inset-0 rounded-full border-2 border-amber-500"
+          className="absolute inset-0 rounded-full border-2 border-[#1D1D1F]"
         />
       )}
       {recording ? (
-        <MicrophoneSlash size={20} color="#f59e0b" weight="fill" />
+        <MicrophoneSlash size={20} color="#1D1D1F" weight="fill" />
       ) : (
         <Microphone size={20} color="#71717a" />
       )}

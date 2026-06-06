@@ -8,15 +8,15 @@ import { useRouter } from 'next/navigation';
 const demos = [
   {
     user: 'If ETH drops 30%, what happens?',
-    vela: <>Portfolio drops roughly <span className="font-mono font-semibold text-[#FF9500]">$14,200</span>. ARB takes the hardest hit — <span className="font-mono font-semibold text-[#FF9500]">87%</span> correlated to ETH.</>,
+    vela: <>Portfolio drops roughly <span className="font-mono font-semibold text-[#1D1D1F]">$14,200</span>. ARB takes the hardest hit — <span className="font-mono font-semibold text-[#1D1D1F]">87%</span> correlated to ETH.</>,
   },
   {
     user: 'How concentrated am I?',
-    vela: <>Top 3 positions make up <span className="font-mono font-semibold text-[#FF9500]">73%</span> of your value. ETH at <span className="font-mono font-semibold text-[#FF9500]">48%</span>, ARB at <span className="font-mono font-semibold text-[#FF9500]">23%</span>.</>,
+    vela: <>Top 3 positions make up <span className="font-mono font-semibold text-[#1D1D1F]">73%</span> of your value. ETH at <span className="font-mono font-semibold text-[#1D1D1F]">48%</span>, ARB at <span className="font-mono font-semibold text-[#1D1D1F]">23%</span>.</>,
   },
   {
     user: "What's my worst position right now?",
-    vela: <>ARB is down <span className="font-mono font-semibold text-[#FF9500]">18.3%</span> since entry — <span className="font-mono font-semibold text-[#FF9500]">$847</span> in the red. Your highest-risk hold.</>,
+    vela: <>ARB is down <span className="font-mono font-semibold text-[#1D1D1F]">18.3%</span> since entry — <span className="font-mono font-semibold text-[#1D1D1F]">$847</span> in the red. Your highest-risk hold.</>,
   },
 ];
 
@@ -49,12 +49,12 @@ export default function Hero() {
           <div className="flex items-center gap-2.5">
             <VelaMascot size={26} />
             <span className="font-semibold text-[#1D1D1F] text-[15px] tracking-tight">
-              Vela<span className="text-[#FF9500]">.</span>
+              Vela<span className="text-[#AEAEB2]">.</span>
             </span>
           </div>
           <button
             onClick={() => setShowConnect(true)}
-            className="text-[13px] font-semibold text-[#FF9500] hover:text-[#E08800] transition-colors"
+            className="text-[13px] font-semibold text-[#1D1D1F] hover:text-[#1D1D1F] transition-colors"
           >
             Get started →
           </button>
@@ -87,7 +87,7 @@ export default function Hero() {
               <motion.div key="cta" className="flex gap-3" exit={{ opacity: 0 }}>
                 <button
                   onClick={() => setShowConnect(true)}
-                  className="bg-[#FF9500] hover:bg-[#E08800] text-white font-semibold text-[15px] px-6 py-3 rounded-full transition-colors active:scale-[0.97]"
+                  className="bg-[#1D1D1F] hover:bg-[#1D1D1F] text-white font-semibold text-[15px] px-6 py-3 rounded-full transition-colors active:scale-[0.97]"
                 >
                   Try your wallet
                 </button>
@@ -142,7 +142,7 @@ export default function Hero() {
                   <motion.div key={i}
                     animate={{ height: ['3px','12px','3px'] }}
                     transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                    className="w-1 rounded-full bg-[#FF9500]" style={{ minHeight: 3 }} />
+                    className="w-1 rounded-full bg-[#1D1D1F]" style={{ minHeight: 3 }} />
                 ))}
                 <span className="text-[10px] font-mono text-[#AEAEB2] ml-1 uppercase tracking-wider">Speaking</span>
               </>
@@ -155,7 +155,7 @@ export default function Hero() {
           <div className="px-4 pb-4 bg-white">
             <div className="flex items-center gap-2 bg-[#F5F5F7] border border-[#E8E8ED] rounded-full px-4 py-2.5">
               <span className="text-[13px] text-[#AEAEB2] flex-1">Ask your wallet anything...</span>
-              <div className="w-7 h-7 rounded-full bg-[#FF9500] flex items-center justify-center">
+              <div className="w-7 h-7 rounded-full bg-[#1D1D1F] flex items-center justify-center">
                 <span className="text-white text-[13px] font-bold leading-none">↑</span>
               </div>
             </div>

@@ -218,7 +218,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-[#FF9500] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#FFB340] transition-all active:scale-95"
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-[#1D1D1F] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#1D1D1F] transition-all active:scale-95"
           >
             <ArrowUp size={14} color="white" weight="bold" />
           </button>

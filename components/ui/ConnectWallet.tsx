@@ -33,7 +33,7 @@ export default function ConnectWallet({ onConnect }: Props) {
   return (
     <div className="flex flex-col gap-2.5 w-full max-w-xs">
       <button onClick={connectEVM} disabled={connecting}
-        className="btn-amber-glow flex items-center justify-center gap-2 px-5 py-3 bg-[#FF9500] hover:bg-[#F08C00] text-white font-semibold text-[14px] rounded-full disabled:opacity-50 transition-colors">
+        className="btn-amber-glow flex items-center justify-center gap-2 px-5 py-3 bg-[#1D1D1F] hover:bg-[#F08C00] text-white font-semibold text-[14px] rounded-full disabled:opacity-50 transition-colors">
         <Wallet size={16} weight="fill" />
         {connecting ? 'Connecting...' : 'Connect EVM Wallet'}
       </button>

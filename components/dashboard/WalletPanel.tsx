@@ -55,7 +55,7 @@ export default function WalletPanel({ address, chainType }: Props) {
         <div className="text-[11px] tracking-[0.18em] text-[#AEAEB2] font-mono uppercase mb-2">Wallet</div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-[12px] text-[#6E6E73]">{address.slice(0, 6)}...{address.slice(-4)}</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-medium ${chainType === 'solana' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-[#FF9500]'}`}>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-medium ${chainType === 'solana' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-[#1D1D1F]'}`}>
             {chainType === 'solana' ? 'SOL' : 'ETH'}
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function WalletPanel({ address, chainType }: Props) {
                     initial={{ width: 0 }}
                     animate={{ width: `${item.pct}%` }}
                     transition={{ duration: 0.5, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
-                    className={`h-full rounded-full ${i === 0 ? 'bg-[#FF9500]' : 'bg-[#D2D2D7]'}`}
+                    className={`h-full rounded-full ${i === 0 ? 'bg-[#1D1D1F]' : 'bg-[#D2D2D7]'}`}
                   />
                 </div>
               </motion.div>

@@ -26,7 +26,7 @@ export default function ReasoningSteps({ activeStep }: Props) {
           {activeStep > i ? (
             <Check size={11} color="#34C759" weight="bold" />
           ) : activeStep === i ? (
-            <div className="w-1.5 h-1.5 rounded-full bg-[#FF9500]" />
+            <div className="w-1.5 h-1.5 rounded-full bg-[#1D1D1F]" />
           ) : (
             <div className="w-1.5 h-1.5 rounded-full bg-[#D2D2D7]" />
           )}

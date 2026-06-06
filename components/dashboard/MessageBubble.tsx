@@ -15,7 +15,7 @@ function HighlightedText({ text }: { text: string }) {
     <>
       {parts.map((part, i) =>
         /^\$[\d,]+\.?\d*$|^[\d,]+\.?\d*%$|^\d+\.?\d*[xX]$/.test(part) ? (
-          <span key={i} className="font-mono text-[#FF9500] font-medium">{part}</span>
+          <span key={i} className="font-mono text-[#1D1D1F] font-medium">{part}</span>
         ) : (
           <span key={i}>{part}</span>
         )
@@ -59,7 +59,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
                 key={i}
                 animate={{ scaleY: [0.3, 1, 0.3] }}
                 transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                className="w-0.5 bg-[#FF9500] rounded-full origin-bottom"
+                className="w-0.5 bg-[#1D1D1F] rounded-full origin-bottom"
                 style={{ height: '100%' }}
               />
             ))}

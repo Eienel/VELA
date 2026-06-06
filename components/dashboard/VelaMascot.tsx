@@ -56,7 +56,7 @@ export default function VelaMascot({ size = 48, thinking = false, speaking = fal
           cx={c}
           cy={tipY}
           r={s * 0.07}
-          fill="#FF9500"
+          fill="#1D1D1F"
           animate={speaking ? { scale: [1, 1.5, 1], opacity: [1, 0.7, 1] } : { scale: 1, opacity: 1 }}
           transition={speaking ? { duration: 0.75, repeat: Infinity } : {}}
           style={{ transformOrigin: `${c}px ${tipY}px` }}

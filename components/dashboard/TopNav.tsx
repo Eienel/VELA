@@ -16,7 +16,7 @@ export default function TopNav({ address, chainType, onDisconnect }: Props) {
       <div className="flex items-center gap-2.5">
         <VelaMascot size={28} />
         <span className="font-semibold text-[#1D1D1F] text-[15px] tracking-tight">
-          Vela<span className="text-[#FF9500]">.</span>
+          Vela<span className="text-[#AEAEB2]">.</span>
         </span>
         <span className="hidden md:block text-[11px] text-[#AEAEB2] ml-1 font-mono uppercase tracking-[0.18em]">Portfolio AI</span>
       </div>
@@ -31,7 +31,7 @@ export default function TopNav({ address, chainType, onDisconnect }: Props) {
           <div className="w-px h-4 bg-[#D2D2D7]" />
 
           <div className="flex items-center gap-2 bg-[#F5F5F7] px-3 py-1.5 rounded-full border border-[#D2D2D7]">
-            <div className={`w-1.5 h-1.5 rounded-full ${chainType === 'solana' ? 'bg-purple-500' : 'bg-[#FF9500]'}`} />
+            <div className={`w-1.5 h-1.5 rounded-full ${chainType === 'solana' ? 'bg-purple-500' : 'bg-[#1D1D1F]'}`} />
             <span className="font-mono text-[12px] text-[#1D1D1F]">{truncate(address)}</span>
             <span className="text-[10px] text-[#6E6E73] uppercase tracking-wider font-mono">{chainLabel}</span>
           </div>
