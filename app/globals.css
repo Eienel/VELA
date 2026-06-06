@@ -2,19 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg: #FFFFFF;
-  --surface: #FAFAFA;
-  --border: #E8E8ED;
-  --muted: #6E6E73;
-  --text: #1D1D1F;
-  --text-secondary: #6E6E73;
-  --text-tertiary: #AEAEB2;
-  --accent: #FF9500;
-  --positive: #34C759;
-  --negative: #FF3B30;
-}
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -23,43 +10,11 @@ body {
   background: #fff;
   color: #1D1D1F;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 2px; }
 
-::selection { background: rgba(255,149,0,0.18); }
-
-/* Gradient mesh orbs — light, warm, subtle */
-.orb-warm {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  pointer-events: none;
-  animation: orb-float 14s ease-in-out infinite;
-}
-.orb-warm-2 { animation-duration: 20s; animation-direction: reverse; }
-
-@keyframes orb-float {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  40% { transform: translate(24px, -18px) scale(1.04); }
-  70% { transform: translate(-16px, 12px) scale(0.97); }
-}
-
-/* Dot grid — very light */
-.dot-grid {
-  background-image: radial-gradient(circle, #E8E8ED 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* Glow on amber button */
-.btn-amber-glow {
-  box-shadow: 0 4px 14px rgba(255,149,0,0.30), 0 1px 3px rgba(0,0,0,0.08);
-  transition: box-shadow 0.2s, transform 0.15s;
-}
-.btn-amber-glow:hover {
-  box-shadow: 0 6px 22px rgba(255,149,0,0.45), 0 2px 6px rgba(0,0,0,0.1);
-  transform: translateY(-1px);
-}
-.btn-amber-glow:active { transform: scale(0.97); }
+::selection { background: rgba(255,149,0,0.15); }
