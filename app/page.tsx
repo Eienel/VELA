@@ -5,7 +5,7 @@ import TechStack from '@/components/landing/TechStack';
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[#070708]">
+    <main className="min-h-screen bg-white">
       <Hero />
       <HowItWorks />
       <QueryCarousel />

@@ -9,55 +9,62 @@ interface Props {
 
 export default function VelaMascot({ size = 48, thinking = false, speaking = false }: Props) {
   const s = size;
-  const center = s / 2;
+  const c = s / 2;
+  const outerR = s * 0.44;
+  const circ = 2 * Math.PI * outerR;
 
-  // 5-point star path
-  const starPath = () => {
-    const outerR = s * 0.42;
-    const innerR = s * 0.18;
-    const points = 5;
-    let path = '';
-    for (let i = 0; i < points * 2; i++) {
-      const r = i % 2 === 0 ? outerR : innerR;
-      const angle = (i * Math.PI) / points - Math.PI / 2;
-      const x = center + r * Math.cos(angle);
-      const y = center + r * Math.sin(angle);
-      path += (i === 0 ? 'M' : 'L') + `${x},${y}`;
-    }
-    return path + 'Z';
-  };
-
-  const ringR = center - 2;
-  const circ = 2 * Math.PI * ringR;
+  // Navigation chevron / V-shape
+  const arm = s * 0.22;
+  const tipY = c + s * 0.14;
+  const topY = c - s * 0.16;
+  const leftX = c - arm;
+  const rightX = c + arm;
 
   return (
-    <div style={{ display: 'inline-block' }}>
+    <div style={{ display: 'inline-block', flexShrink: 0 }}>
       <svg width={s} height={s} viewBox={`0 0 ${s} ${s}`}>
-        {/* Orbital ring — partial arc, rotates only when thinking */}
+        {/* Thin outer ring — partial arc, rotates when thinking */}
         <motion.circle
-          cx={center}
-          cy={center}
-          r={ringR}
-          stroke="#f59e0b"
-          strokeOpacity={0.4}
-          strokeWidth={1.5}
+          cx={c}
+          cy={c}
+          r={outerR}
+          stroke="#D2D2D7"
+          strokeWidth={1}
           fill="none"
-          strokeDasharray={`${circ * 0.7} ${circ * 0.3}`}
+          strokeDasharray={`${circ * 0.72} ${circ * 0.28}`}
           animate={thinking ? { rotate: 360 } : { rotate: 0 }}
-          transition={thinking ? { duration: 1.6, repeat: Infinity, ease: 'linear' } : { duration: 0.4 }}
-          style={{ transformOrigin: `${center}px ${center}px` }}
+          transition={thinking ? { duration: 1.8, repeat: Infinity, ease: 'linear' } : { duration: 0.5 }}
+          style={{ transformOrigin: `${c}px ${c}px` }}
         />
-        {/* Star body */}
-        <motion.path
-          d={starPath()}
-          fill="#f59e0b"
-          animate={speaking ? { scale: [1, 1.05, 1] } : { scale: 1 }}
-          transition={speaking ? { duration: 0.8, repeat: Infinity } : {}}
-          style={{ transformOrigin: `${center}px ${center}px` }}
+        {/* V chevron lines */}
+        <line
+          x1={leftX} y1={topY}
+          x2={c} y2={tipY}
+          stroke="#1D1D1F"
+          strokeWidth={s * 0.048}
+          strokeLinecap="round"
         />
-        {/* Eyes */}
-        <rect x={center - 5} y={center - 7} width={3} height={4} rx={1} fill="#09090b" />
-        <rect x={center + 2} y={center - 7} width={3} height={4} rx={1} fill="#09090b" />
+        <line
+          x1={rightX} y1={topY}
+          x2={c} y2={tipY}
+          stroke="#1D1D1F"
+          strokeWidth={s * 0.048}
+          strokeLinecap="round"
+        />
+        {/* Amber vertex dot */}
+        <motion.circle
+          cx={c}
+          cy={tipY}
+          r={s * 0.07}
+          fill="#FF9500"
+          animate={speaking ? { scale: [1, 1.5, 1], opacity: [1, 0.7, 1] } : { scale: 1, opacity: 1 }}
+          transition={speaking ? { duration: 0.75, repeat: Infinity } : {}}
+          style={{ transformOrigin: `${c}px ${tipY}px` }}
+        />
+        {/* Small top-left dot */}
+        <circle cx={leftX} cy={topY} r={s * 0.035} fill="#AEAEB2" />
+        {/* Small top-right dot */}
+        <circle cx={rightX} cy={topY} r={s * 0.035} fill="#AEAEB2" />
       </svg>
     </div>
   );

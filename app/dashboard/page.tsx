@@ -49,15 +49,15 @@ export default function Dashboard() {
 
   if (!address) {
     return (
-      <div className="min-h-screen bg-[#070708] flex flex-col items-center justify-center gap-8">
-        <h2 className="font-display text-3xl font-bold tracking-tighter text-zinc-50">Connect your wallet to start</h2>
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center gap-8">
+        <h2 className="text-[28px] font-semibold tracking-tight text-[#1D1D1F]">Connect your wallet to start</h2>
         <ConnectWallet onConnect={handleConnect} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen bg-[#F5F5F7]">
       <TopNav address={address} chainType={chainType} onDisconnect={handleDisconnect} />
       <div className="grid flex-1 overflow-hidden" style={{ gridTemplateColumns: '280px 1fr 300px' }}>
         <WalletPanel address={address} chainType={chainType} />

@@ -9,14 +9,13 @@ interface Props {
   isPlaying?: boolean;
 }
 
-// Safe inline number highlighter — no dangerouslySetInnerHTML
 function HighlightedText({ text }: { text: string }) {
   const parts = text.split(/(\$[\d,]+\.?\d*|[\d,]+\.?\d*%|\d+\.?\d*[xX])/g);
   return (
     <>
       {parts.map((part, i) =>
         /^\$[\d,]+\.?\d*$|^[\d,]+\.?\d*%$|^\d+\.?\d*[xX]$/.test(part) ? (
-          <span key={i} className="font-mono text-amber-400">{part}</span>
+          <span key={i} className="font-mono text-[#FF9500] font-medium">{part}</span>
         ) : (
           <span key={i}>{part}</span>
         )
@@ -32,9 +31,9 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className="flex justify-end mb-5"
+        className="flex justify-end mb-4"
       >
-        <div className="max-w-[72%] bg-zinc-900 border border-zinc-700 rounded-none px-4 py-2.5 text-sm text-zinc-100 leading-relaxed">
+        <div className="max-w-[72%] bg-[#1D1D1F] rounded-2xl rounded-br-md px-4 py-2.5 text-[14px] text-white leading-relaxed">
           {content}
         </div>
       </motion.div>
@@ -46,14 +45,13 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
       initial={{ opacity: 0, y: 6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className="flex gap-3 mb-5"
+      className="flex gap-3 mb-4"
     >
-      <div className="flex-1 border-l border-amber-500/40 pl-3">
-        <div className="text-sm text-zinc-200 leading-relaxed">
+      <div className="flex-1">
+        <div className="text-[14px] text-[#1D1D1F] leading-relaxed">
           <HighlightedText text={content} />
         </div>
 
-        {/* Waveform while playing */}
         {isPlaying && (
           <div className="flex gap-0.5 items-end h-3 mt-2">
             {[0, 1, 2, 3, 4].map(i => (
@@ -61,7 +59,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
                 key={i}
                 animate={{ scaleY: [0.3, 1, 0.3] }}
                 transition={{ duration: 0.5, repeat: Infinity, delay: i * 0.1 }}
-                className="w-0.5 bg-amber-500 rounded-none origin-bottom"
+                className="w-0.5 bg-[#FF9500] rounded-full origin-bottom"
                 style={{ height: '100%' }}
               />
             ))}
@@ -71,7 +69,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
         {onReplay && (
           <button
             onClick={onReplay}
-            className="mt-2 flex items-center gap-1.5 text-xs text-zinc-700 hover:text-zinc-500 transition-colors"
+            className="mt-2 flex items-center gap-1.5 text-[12px] text-[#AEAEB2] hover:text-[#6E6E73] transition-colors"
           >
             {isPlaying ? <SpeakerSlash size={11} /> : <SpeakerHigh size={11} />}
             {isPlaying ? 'Playing' : 'Replay voice'}

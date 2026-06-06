@@ -38,75 +38,76 @@ export default function WalletPanel({ address, chainType }: Props) {
 
   if (loading) {
     return (
-      <div className="p-5 space-y-4 animate-pulse bg-[#070708] border-r border-zinc-800">
-        <div className="h-3 bg-zinc-800 rounded w-16" />
-        <div className="h-10 bg-zinc-800 rounded w-36" />
-        <div className="h-4 bg-zinc-800 rounded w-24" />
-        <div className="h-px bg-zinc-800 my-4" />
-        {[1,2,3].map(i => <div key={i} className="h-6 bg-zinc-800 rounded" />)}
+      <div className="p-5 space-y-4 animate-pulse bg-white border-r border-[#D2D2D7]">
+        <div className="h-2.5 bg-[#F5F5F7] rounded-full w-16" />
+        <div className="h-9 bg-[#F5F5F7] rounded-xl w-36" />
+        <div className="h-4 bg-[#F5F5F7] rounded-full w-24" />
+        <div className="h-px bg-[#F5F5F7] my-4" />
+        {[1,2,3].map(i => <div key={i} className="h-6 bg-[#F5F5F7] rounded-xl" />)}
       </div>
     );
   }
 
   return (
-    <div className="bg-[#070708] border-r border-zinc-800 overflow-y-auto flex flex-col">
-      {/* Wallet header */}
-      <div className="p-5 pb-4 border-b border-zinc-800">
-        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-2">Wallet</div>
+    <div className="bg-white border-r border-[#D2D2D7] overflow-y-auto flex flex-col">
+      {/* Wallet address */}
+      <div className="p-5 pb-4 border-b border-[#F5F5F7]">
+        <div className="text-[11px] tracking-[0.18em] text-[#AEAEB2] font-mono uppercase mb-2">Wallet</div>
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-zinc-400">{address.slice(0, 6)}...{address.slice(-4)}</span>
-          <span className={`text-[10px] px-1.5 py-0.5 rounded-none font-mono uppercase tracking-wider ${chainType === 'solana' ? 'bg-violet-500/10 text-violet-400' : 'bg-amber-500/10 text-amber-500'}`}>
+          <span className="font-mono text-[12px] text-[#6E6E73]">{address.slice(0, 6)}...{address.slice(-4)}</span>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-medium ${chainType === 'solana' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-[#FF9500]'}`}>
             {chainType === 'solana' ? 'SOL' : 'ETH'}
           </span>
         </div>
       </div>
 
       {/* Total value */}
-      <div className="p-5 pb-4 border-b border-zinc-800">
-        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-2">Total Value</div>
-        <div className="font-display text-4xl text-zinc-50 font-bold tracking-tight leading-none">
+      <div className="p-5 pb-4 border-b border-[#F5F5F7]">
+        <div className="text-[11px] tracking-[0.18em] text-[#AEAEB2] font-mono uppercase mb-2">Total Value</div>
+        <div className="text-[34px] text-[#1D1D1F] font-semibold tracking-tight leading-none">
           ${totalValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
         </div>
-        <div className={`font-mono text-sm mt-2 ${change24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+        <div className={`font-mono text-[13px] mt-2 font-medium ${change24h >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
           {change24h >= 0 ? '+' : ''}${Math.abs(change24h).toFixed(2)}
-          <span className="text-zinc-600 mx-1">·</span>
-          {change24hPct >= 0 ? '+' : ''}{change24hPct.toFixed(1)}% today
+          <span className="text-[#AEAEB2] mx-1 font-sans font-normal">·</span>
+          {change24hPct >= 0 ? '+' : ''}{change24hPct.toFixed(1)}%
+          <span className="text-[#AEAEB2] ml-1 font-sans font-normal text-[12px]">today</span>
         </div>
         {totalPnL !== 0 && (
-          <div className={`font-mono text-xs mt-1 ${totalPnL >= 0 ? 'text-green-500/70' : 'text-red-500/70'}`}>
-            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(0)} unrealized PnL
+          <div className={`font-mono text-[11px] mt-1 ${totalPnL >= 0 ? 'text-[#34C759]/80' : 'text-[#FF3B30]/80'}`}>
+            {totalPnL >= 0 ? '+' : ''}${totalPnL.toFixed(0)} unrealized P&L
           </div>
         )}
       </div>
 
-      {/* Allocation */}
+      {/* Allocation bars */}
       <div className="p-5 flex-1">
-        <div className="text-[10px] tracking-[0.25em] text-zinc-600 font-mono uppercase mb-4">
-          Allocation <span className="text-zinc-700 ml-1">/ {positions.length}</span>
+        <div className="text-[11px] tracking-[0.18em] text-[#AEAEB2] font-mono uppercase mb-4">
+          Allocation <span className="text-[#D2D2D7] ml-1">/ {positions.length}</span>
         </div>
         {positions.length === 0 ? (
-          <p className="text-xs text-zinc-700 leading-relaxed">
+          <p className="text-[13px] text-[#AEAEB2] leading-relaxed">
             No token balances found. Use the demo wallet to explore Vela.
           </p>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-3.5">
             {allocationBars.map((item, i) => (
               <motion.div
                 key={item.symbol}
-                initial={{ opacity: 0, x: -10 }}
+                initial={{ opacity: 0, x: -8 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.06 }}
               >
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-zinc-400 font-mono">{item.symbol}</span>
-                  <span className="font-mono text-zinc-500">{item.pct.toFixed(1)}%</span>
+                <div className="flex justify-between text-[12px] mb-1.5">
+                  <span className="text-[#1D1D1F] font-mono font-medium">{item.symbol}</span>
+                  <span className="font-mono text-[#6E6E73]">{item.pct.toFixed(1)}%</span>
                 </div>
-                <div className="h-1.5 bg-zinc-800 rounded-none overflow-hidden">
+                <div className="h-1 bg-[#F5F5F7] rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${item.pct}%` }}
-                    transition={{ duration: 0.4, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
-                    className={`h-full rounded-none ${i === 0 ? 'bg-amber-500' : 'bg-zinc-600'}`}
+                    transition={{ duration: 0.5, delay: i * 0.06, ease: [0.2, 0.8, 0.2, 1] }}
+                    className={`h-full rounded-full ${i === 0 ? 'bg-[#FF9500]' : 'bg-[#D2D2D7]'}`}
                   />
                 </div>
               </motion.div>

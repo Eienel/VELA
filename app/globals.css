@@ -3,16 +3,17 @@
 @tailwind utilities;
 
 :root {
-  --bg: #070708;
-  --surface: #18181b;
-  --border: #27272a;
-  --muted: #71717a;
-  --text: #d4d4d8;
-  --text-primary: #fafafa;
-  --accent: #f59e0b;
-  --accent-bright: #fbbf24;
-  --positive: #22c55e;
-  --negative: #ef4444;
+  --bg: #F5F5F7;
+  --surface: #FFFFFF;
+  --border: #D2D2D7;
+  --muted: #6E6E73;
+  --text: #1D1D1F;
+  --text-secondary: #6E6E73;
+  --text-tertiary: #AEAEB2;
+  --accent: #FF9500;
+  --accent-bright: #FFB340;
+  --positive: #34C759;
+  --negative: #FF3B30;
 }
 
 * {
@@ -26,7 +27,7 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", system-ui, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
@@ -34,24 +35,12 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Smoother scrollbar */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #27272a; border-radius: 2px; }
+::-webkit-scrollbar-thumb { background: #D2D2D7; border-radius: 2px; }
 
-/* Selection color */
-::selection { background: rgba(245,158,11,0.2); color: #fafafa; }
+::selection { background: rgba(255,149,0,0.18); color: #1D1D1F; }
 
-.mono {
-  font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
-}
-
-.font-display {
-  font-family: var(--font-display), system-ui, sans-serif;
-}
-
-@layer utilities {
-  .font-mono-numbers {
-    font-family: "SF Mono", ui-monospace, "Cascadia Code", "Fira Code", monospace;
-  }
+.font-mono {
+  font-family: "SF Mono", "Menlo", "Monaco", Consolas, monospace;
 }

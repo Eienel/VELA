@@ -47,7 +47,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
-  // Free browser-native fallback when ElevenLabs is unavailable
   const speakWithBrowser = (id: string, text: string) => {
     if (typeof window === 'undefined' || !window.speechSynthesis) {
       setPlayingId(null);
@@ -57,7 +56,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = 1.0;
     utterance.pitch = 1.0;
-    // Prefer a calm English voice if available
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find(v => /en[-_]US/i.test(v.lang) && /Google|Samantha|Daniel/i.test(v.name))
       || voices.find(v => /en/i.test(v.lang));
@@ -82,7 +80,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
-      // ElevenLabs unavailable (e.g. free tier blocked) -> browser TTS
       if (!response.ok) { speakWithBrowser(id, text); return; }
       const blob = await response.blob();
       if (blob.size === 0 || !blob.type.includes('audio')) { speakWithBrowser(id, text); return; }
@@ -114,9 +111,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
   const handleVoiceTranscript = (text: string) => {
     setInputValue(text);
-    setTimeout(() => {
-      handleSend(text);
-    }, 800);
+    setTimeout(() => handleSend(text), 800);
   };
 
   const onSubmit = (e: React.FormEvent) => {
@@ -124,7 +119,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     handleSend(inputValue);
   };
 
-  // Helper to get text content from a message
   const getMessageText = (msg: any): string => {
     if (typeof msg.content === 'string') return msg.content;
     const textPart = msg.parts?.find((p: any) => p.type === 'text');
@@ -138,29 +132,33 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   ];
 
   return (
-    <div className="flex flex-col h-full bg-[#070708]">
+    <div className="flex flex-col h-full bg-[#F5F5F7]">
       {/* Mascot header */}
-      <div className="flex flex-col items-center pt-4 pb-4 border-b border-zinc-800">
+      <div className="flex flex-col items-center pt-5 pb-4 border-b border-[#E5E5EA] bg-white">
         <VelaMascot
-          size={48}
+          size={44}
           thinking={isLoading && reasoningStep < 3}
           speaking={!!playingId}
         />
-        <div className="text-[10px] text-zinc-600 mt-2 uppercase tracking-[0.25em] font-mono">Vela / Ready</div>
+        <div className="text-[11px] text-[#AEAEB2] mt-2 uppercase tracking-[0.2em] font-mono">
+          {isLoading ? 'Thinking...' : playingId ? 'Speaking' : 'Ready'}
+        </div>
       </div>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-6 py-4">
+      <div className="flex-1 overflow-y-auto px-5 py-5">
         {messages.length === 0 && (
-          <div className="flex flex-col items-start gap-3 text-zinc-600 text-sm mt-8">
-            <p className="font-display text-2xl font-bold tracking-tight text-zinc-300 leading-tight">Ask anything about<br />your positions.</p>
-            <p className="text-[10px] text-zinc-600 uppercase tracking-[0.2em] font-mono">Portfolio loaded / Ready</p>
-            <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-col items-start gap-3 mt-6">
+            <p className="text-[22px] font-semibold tracking-tight text-[#1D1D1F] leading-tight">
+              Ask anything about<br />your positions.
+            </p>
+            <p className="text-[12px] text-[#AEAEB2] uppercase tracking-[0.18em] font-mono">Portfolio loaded · Ready</p>
+            <div className="flex flex-wrap gap-2 mt-2">
               {suggestedQuestions.map(q => (
                 <button
                   key={q}
                   onClick={() => handleSend(q)}
-                  className="font-mono text-xs px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-none text-zinc-500 hover:bg-zinc-800 hover:text-zinc-300 hover:border-zinc-600 transition-colors"
+                  className="font-mono text-[12px] px-3 py-1.5 bg-white border border-[#D2D2D7] rounded-full text-[#6E6E73] hover:bg-[#F5F5F7] hover:text-[#1D1D1F] hover:border-[#AEAEB2] transition-colors"
                 >
                   {q}
                 </button>
@@ -194,22 +192,22 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-zinc-800">
-        <form onSubmit={onSubmit} className="flex items-center gap-2 bg-zinc-900/40 border border-zinc-800 rounded-none px-3 py-1.5">
+      <div className="px-4 py-3 border-t border-[#E5E5EA] bg-white">
+        <form onSubmit={onSubmit} className="flex items-center gap-2 bg-[#F5F5F7] border border-[#D2D2D7] rounded-full px-4 py-2">
           <VoiceButton onTranscript={handleVoiceTranscript} disabled={isLoading} />
           <input
             value={inputValue}
             onChange={e => setInputValue(e.target.value)}
-            placeholder="Ask Vela anything about your portfolio..."
-            className="flex-1 bg-transparent text-sm text-zinc-200 placeholder-zinc-700 outline-none"
+            placeholder="Ask Vela about your portfolio..."
+            className="flex-1 bg-transparent text-[14px] text-[#1D1D1F] placeholder-[#AEAEB2] outline-none"
             disabled={isLoading}
           />
           <button
             type="submit"
             disabled={!inputValue.trim() || isLoading}
-            className="w-8 h-8 flex items-center justify-center rounded-none bg-amber-500 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-400 transition-transform active:scale-[0.98]"
+            className="w-7 h-7 flex items-center justify-center rounded-full bg-[#FF9500] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[#FFB340] transition-all active:scale-95"
           >
-            <ArrowUp size={16} color="#09090b" weight="bold" />
+            <ArrowUp size={14} color="white" weight="bold" />
           </button>
         </form>
       </div>

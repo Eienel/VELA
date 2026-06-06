@@ -13,10 +13,10 @@ export default function Button({ children, onClick, variant = 'primary', classNa
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-6 py-3 rounded-none font-semibold text-sm transition-transform active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 ${
+      className={`px-5 py-2.5 rounded-full font-semibold text-[14px] transition-all active:scale-[0.97] disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 ${
         variant === 'primary'
-          ? 'bg-amber-500 hover:bg-amber-400 text-zinc-950'
-          : 'border border-zinc-700 bg-transparent text-zinc-300 hover:border-zinc-500'
+          ? 'bg-[#1D1D1F] hover:bg-[#3D3D3F] text-white shadow-card'
+          : 'border border-[#D2D2D7] bg-white text-[#1D1D1F] hover:bg-[#F5F5F7]'
       } ${className}`}
     >
       {children}
