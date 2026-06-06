@@ -4,9 +4,10 @@ import { Wallet } from '@phosphor-icons/react';
 
 interface Props {
   onConnect: (address: string, chainType: 'evm' | 'solana') => void;
+  dark?: boolean;
 }
 
-export default function ConnectWallet({ onConnect }: Props) {
+export default function ConnectWallet({ onConnect, dark = false }: Props) {
   const [connecting, setConnecting] = useState(false);
   const [error, setError] = useState('');
 
@@ -48,6 +49,34 @@ export default function ConnectWallet({ onConnect }: Props) {
     onConnect('0x3f5CE5FBFe3E9af3971dD833D26BA9b5C936f0BE', 'evm');
   };
 
+  if (dark) {
+    return (
+      <div className="flex flex-col gap-2.5 w-full max-w-xs">
+        <button
+          onClick={connectEVM}
+          disabled={connecting}
+          className="btn-glow flex items-center justify-center gap-2 px-6 py-3.5 rounded-full font-semibold text-[14px] text-black transition-all active:scale-[0.97] disabled:opacity-50"
+          style={{ background: 'linear-gradient(135deg, #FF9500, #FFD60A)' }}
+        >
+          <Wallet size={16} weight="fill" />
+          {connecting ? 'Connecting...' : 'Connect EVM Wallet'}
+        </button>
+        <button
+          onClick={connectSolana}
+          disabled={connecting}
+          className="flex items-center justify-center gap-2 px-6 py-3.5 border border-white/15 bg-white/5 backdrop-blur text-white/70 font-semibold text-[14px] rounded-full transition-all active:scale-[0.97] hover:bg-white/10 disabled:opacity-50"
+        >
+          <Wallet size={16} />
+          Connect Solana Wallet
+        </button>
+        <button onClick={useDemoWallet} className="text-[13px] text-white/30 hover:text-white/50 transition-colors text-center py-1.5">
+          Use demo wallet
+        </button>
+        {error && <p className="text-[12px] text-[#FF3B30]">{error}</p>}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-2.5 w-full max-w-xs">
       <button
@@ -66,10 +95,7 @@ export default function ConnectWallet({ onConnect }: Props) {
         <Wallet size={16} />
         Connect Solana Wallet
       </button>
-      <button
-        onClick={useDemoWallet}
-        className="text-[13px] text-[#AEAEB2] hover:text-[#6E6E73] transition-colors text-center py-2"
-      >
+      <button onClick={useDemoWallet} className="text-[13px] text-[#AEAEB2] hover:text-[#6E6E73] transition-colors text-center py-2">
         Use demo wallet
       </button>
       {error && <p className="text-[12px] text-[#FF3B30]">{error}</p>}
