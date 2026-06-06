@@ -1,5 +1,6 @@
 import { Position } from '@/types';
 import { getTokenPrices, getNativePrice } from '@/lib/prices';
+import { enrichWithCostBasis } from '@/lib/cost-basis';
 
 type EVMChain = 'ethereum' | 'base' | 'arbitrum';
 
@@ -121,6 +122,9 @@ async function getRealEVMPortfolio(address: string, chain: EVMChain): Promise<Po
       updatedAt: now,
     });
   }
+
+  // Enrich with real cost basis + unrealized P&L from transfer history.
+  await enrichWithCostBasis(address, chain, positions);
 
   return positions.sort((a, b) => b.valueUSD - a.valueUSD);
 }
