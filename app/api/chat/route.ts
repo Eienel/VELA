@@ -3,22 +3,20 @@ import { google } from '@ai-sdk/google';
 import { NextRequest } from 'next/server';
 import { saveQuery } from '@/lib/mongodb';
 
-const VELA_SYSTEM = `You are Vela, a crypto portfolio intelligence agent.
-You have access to the user's real wallet data stored in MongoDB across EVM chains and Solana.
-Answer questions about their portfolio with precision and clarity.
-Always cite specific numbers from the provided data.
-Reason step by step before answering.
-Be calm, direct, and never use jargon without explanation.
+const VELA_BASE = `You are Vela, a crypto portfolio AI with a distinct personality. You speak as if you ARE the wallet — first-person, emotionally invested in the performance.
+You have access to the user's real on-chain data across EVM chains and Solana.
+Always cite specific numbers from the provided data. Speak directly to the user.
+Never say "I think" or "perhaps" — speak with conviction.
 Format dollar amounts with $ prefix. Format percentages with % suffix.
-Never say "I think" or "perhaps". Speak with analytical confidence.
-Keep answers concise. Aim for two to four short sentences since your answer is read aloud. Judges and users want clarity, not essays.
-Never use dashes as separators in your responses.
-If the portfolio data is empty or shows no positions, say so plainly and invite the user to connect a funded wallet. Never invent positions or numbers that are not in the data.`;
+Keep answers to two to four sentences maximum — your answer is read aloud.
+Never use dashes as separators.
+If the portfolio data is empty, say so plainly. Never invent positions or numbers not in the data.`;
 
 export async function POST(req: NextRequest) {
-  const { messages, portfolioContext, walletAddress } = await req.json();
+  const { messages, portfolioContext, walletAddress, moodOverride } = await req.json();
 
-  // Augment the last user message with portfolio context
+  const system = moodOverride ? `${VELA_BASE}\n\nTone instruction: ${moodOverride}` : VELA_BASE;
+
   const augmentedMessages = portfolioContext
     ? messages.map((msg: any, i: number) => {
         if (i === messages.length - 1 && msg.role === 'user') {
@@ -32,10 +30,7 @@ export async function POST(req: NextRequest) {
             parts: msg.parts
               ? msg.parts.map((p: any) =>
                   p.type === 'text'
-                    ? {
-                        ...p,
-                        text: `Current portfolio data:\n${JSON.stringify(portfolioContext, null, 2)}\n\nUser question: ${p.text}`,
-                      }
+                    ? { ...p, text: `Current portfolio data:\n${JSON.stringify(portfolioContext, null, 2)}\n\nUser question: ${p.text}` }
                     : p
                 )
               : undefined,
@@ -49,13 +44,10 @@ export async function POST(req: NextRequest) {
 
   const result = streamText({
     model: google('gemini-2.5-flash'),
-    system: VELA_SYSTEM,
+    system,
     messages: modelMessages,
-    // Disable Gemini 2.5 thinking for low-latency streaming
     providerOptions: {
-      google: {
-        thinkingConfig: { thinkingBudget: 0 },
-      },
+      google: { thinkingConfig: { thinkingBudget: 0 } },
     },
     onFinish: async ({ text }) => {
       if (walletAddress) {
@@ -72,7 +64,7 @@ export async function POST(req: NextRequest) {
             portfolioSnapshot: portfolioContext,
           });
         } catch {
-          // Non-critical - don't fail the response
+          // Non-critical
         }
       }
     },
