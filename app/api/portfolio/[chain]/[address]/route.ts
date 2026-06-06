@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getEVMPortfolio } from '@/lib/portfolio-evm';
 import { getSolanaPortfolio } from '@/lib/portfolio-solana';
+import { getZerionPortfolio, hasZerion } from '@/lib/portfolio-zerion';
 import { upsertPositions, upsertWallet } from '@/lib/mongodb';
 
 export async function GET(
@@ -11,10 +12,22 @@ export async function GET(
     const { chain, address } = params;
     let positions;
 
-    if (chain === 'solana') {
-      positions = await getSolanaPortfolio(address);
-    } else {
-      positions = await getEVMPortfolio(address, chain as 'ethereum' | 'base' | 'arbitrum');
+    // Prefer Zerion when configured: better token coverage + DeFi positions.
+    // Fall back to the Alchemy/Helius readers on error or when no key is set.
+    if (hasZerion()) {
+      try {
+        positions = await getZerionPortfolio(address, chain);
+      } catch (e) {
+        console.error('Zerion read failed, falling back:', e);
+      }
+    }
+
+    if (!positions) {
+      if (chain === 'solana') {
+        positions = await getSolanaPortfolio(address);
+      } else {
+        positions = await getEVMPortfolio(address, chain as 'ethereum' | 'base' | 'arbitrum');
+      }
     }
 
     const totalValue = positions.reduce((sum, p) => sum + p.valueUSD, 0);

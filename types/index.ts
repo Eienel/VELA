@@ -14,6 +14,9 @@ export interface Position {
   costBasisUSD: number;
   unrealizedPnL: number;
   correlationToETH?: number;
+  // For DeFi: 'wallet' | 'staked' | 'deposited' | 'locked' | 'loan' | 'reward'.
+  positionType?: string;
+  protocol?: string;
   updatedAt: Date;
 }
 
