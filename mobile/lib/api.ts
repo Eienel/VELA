@@ -63,6 +63,14 @@ export async function fetchPortfolio(address: string, chainType: 'evm' | 'solana
   return res.json();
 }
 
+export async function fetchVoice(text: string, mood: Mood): Promise<Response> {
+  return fetch(`${API_BASE}/api/voice`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, mood }),
+  });
+}
+
 export async function* streamChat(
   messages: { role: string; content: string }[],
   walletAddress: string,

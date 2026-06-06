@@ -1,17 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { synthesizeGoogleTTS } from '@/lib/google-tts';
+import { synthesizeGoogleTTS, Mood } from '@/lib/google-tts';
 import { streamVoice } from '@/lib/elevenlabs';
 
 export async function POST(req: NextRequest) {
-  const { text } = await req.json();
+  const { text, mood } = await req.json();
 
   if (!text || typeof text !== 'string') {
     return NextResponse.json({ error: 'No text provided' }, { status: 400 });
   }
 
-  // 1) Primary: Gemini native TTS (free tier, no billing, works from Vercel)
+  // 1) Primary: Gemini TTS with mood-styled voice
   try {
-    const result = await synthesizeGoogleTTS(text);
+    const result = await synthesizeGoogleTTS(text, mood as Mood | undefined);
     if (result) {
       return new Response(new Uint8Array(result.audio), {
         headers: {
@@ -21,10 +21,10 @@ export async function POST(req: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Gemini TTS failed, trying ElevenLabs:', error);
+    console.error('Gemini TTS failed:', error);
   }
 
-  // 2) Fallback: ElevenLabs (if a paid key is configured)
+  // 2) Fallback: ElevenLabs
   try {
     const response = await streamVoice(text);
     if (response.ok) {
@@ -36,6 +36,6 @@ export async function POST(req: NextRequest) {
     console.error('ElevenLabs failed:', error);
   }
 
-  // 3) Signal the client to use its browser SpeechSynthesis fallback
+  // 3) Signal client to use browser SpeechSynthesis
   return NextResponse.json({ error: 'TTS unavailable' }, { status: 503 });
 }

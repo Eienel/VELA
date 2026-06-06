@@ -21,6 +21,19 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [inputValue, setInputValue] = useState('');
 
+  // Derive mood from portfolio data
+  const mood = useMemo(() => {
+    if (!portfolioData?.positions?.length) return 'stable';
+    const change24h = portfolioData.positions.reduce(
+      (sum: number, p: any) => sum + (p.valueUSD * p.change24h / 100), 0
+    );
+    const pct = portfolioData.totalValue > 0 ? (change24h / portfolioData.totalValue) * 100 : 0;
+    if (pct > 3) return 'thriving';
+    if (pct > -1) return 'stable';
+    if (pct > -5) return 'worried';
+    return 'devastated';
+  }, [portfolioData]);
+
   const transport = useMemo(
     () =>
       new TextStreamChatTransport({
@@ -78,7 +91,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       const response = await fetch('/api/voice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, mood }),
       });
       if (!response.ok) { speakWithBrowser(id, text); return; }
       const blob = await response.blob();

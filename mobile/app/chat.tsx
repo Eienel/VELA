@@ -12,7 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { StatusBar } from 'expo-status-bar';
 import MoodFace from '../components/MoodFace';
 import Waveform from '../components/Waveform';
-import { fetchPortfolio, getMood, MOOD_META, streamChat, Mood, PortfolioData, API_BASE } from '../lib/api';
+import { fetchPortfolio, fetchVoice, getMood, MOOD_META, streamChat, Mood, PortfolioData } from '../lib/api';
 
 interface Message {
   id: string;
@@ -73,11 +73,7 @@ export default function Chat() {
       }
       Speech.stop();
       setSpeaking(true);
-      const res = await fetch(`${API_BASE}/api/voice`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text }),
-      });
+      const res = await fetchVoice(text, currentMood || mood);
       if (res.ok) {
         const blob = await res.blob();
         // expo-av can play from base64 or uri — use Speech as simpler fallback
