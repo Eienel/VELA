@@ -6,16 +6,17 @@ import { Position } from '@/types';
 interface Props {
   address: string;
   chainType: 'evm' | 'solana';
+  apiChain?: string;
 }
 
-export default function WalletPanel({ address, chainType }: Props) {
+export default function WalletPanel({ address, chainType, apiChain }: Props) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [totalValue, setTotalValue] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!address) return;
-    const chain = chainType === 'solana' ? 'solana' : 'ethereum';
+    const chain = apiChain || (chainType === 'solana' ? 'solana' : 'ethereum');
     fetch(`/api/portfolio/${chain}/${address}`)
       .then(r => r.json())
       .then(data => {
@@ -24,7 +25,7 @@ export default function WalletPanel({ address, chainType }: Props) {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [address, chainType]);
+  }, [address, chainType, apiChain]);
 
   const change24h = positions.reduce((sum, p) => sum + (p.valueUSD * p.change24h / 100), 0);
   const change24hPct = totalValue > 0 ? (change24h / totalValue) * 100 : 0;
@@ -55,8 +56,8 @@ export default function WalletPanel({ address, chainType }: Props) {
         <div className="text-[11px] tracking-[0.18em] text-[#AEAEB2] font-mono uppercase mb-2">Wallet</div>
         <div className="flex items-center gap-2">
           <span className="font-mono text-[12px] text-[#6E6E73]">{address.slice(0, 6)}...{address.slice(-4)}</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-medium ${chainType === 'solana' ? 'bg-purple-50 text-purple-600' : 'bg-orange-50 text-[#1D1D1F]'}`}>
-            {chainType === 'solana' ? 'SOL' : 'ETH'}
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-mono uppercase tracking-wider font-medium ${chainType === 'solana' ? 'bg-purple-50 text-purple-600' : 'bg-[#F0F4FF] text-[#3056D7]'}`}>
+            {chainType === 'solana' ? 'SOL' : (apiChain || 'ETH').toUpperCase()}
           </span>
         </div>
       </div>

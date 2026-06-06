@@ -35,9 +35,9 @@ export default function Hero() {
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [demoIndex]);
 
-  const handleConnect = (address: string, chainType: 'evm' | 'solana') => {
+  const handleConnect = (address: string, chainType: 'evm' | 'solana', specificChain?: string) => {
     localStorage.setItem('vela_address', address);
-    localStorage.setItem('vela_chain', chainType);
+    localStorage.setItem('vela_chain', specificChain || chainType);
     router.push('/dashboard');
   };
 
@@ -67,7 +67,7 @@ export default function Hero() {
         {/* Left */}
         <div>
           <p className="text-[12px] font-mono text-[#AEAEB2] uppercase tracking-[0.2em] mb-6">
-            Portfolio Intelligence · EVM + Solana
+            Portfolio Intelligence · ETH · Base · Arbitrum · Solana
           </p>
 
           <h1 className="text-[60px] md:text-[72px] font-bold tracking-[-0.04em] leading-[1.0] mb-6">
@@ -88,7 +88,7 @@ export default function Hero() {
               <motion.div key="cta" className="flex gap-3" exit={{ opacity: 0 }}>
                 <button
                   onClick={() => setShowConnect(true)}
-                  className="bg-[#1D1D1F] hover:bg-[#1D1D1F] text-white font-semibold text-[15px] px-6 py-3 rounded-full transition-colors active:scale-[0.97]"
+                  className="bg-[#1D1D1F] text-white font-semibold text-[15px] px-6 py-3 rounded-full transition-colors active:scale-[0.97] hover:bg-[#3056D7]"
                 >
                   Try your wallet
                 </button>

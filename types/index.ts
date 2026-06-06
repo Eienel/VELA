@@ -13,7 +13,7 @@ export interface Position {
   change30d: number;
   costBasisUSD: number;
   unrealizedPnL: number;
-  correlationToETH: number;
+  correlationToETH?: number;
   updatedAt: Date;
 }
 

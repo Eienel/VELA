@@ -14,7 +14,7 @@ export async function GET(
     if (chain === 'solana') {
       positions = await getSolanaPortfolio(address);
     } else {
-      positions = await getEVMPortfolio(address);
+      positions = await getEVMPortfolio(address, chain as 'ethereum' | 'base' | 'arbitrum');
     }
 
     const totalValue = positions.reduce((sum, p) => sum + p.valueUSD, 0);
