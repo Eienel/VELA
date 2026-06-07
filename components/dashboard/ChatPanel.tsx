@@ -21,6 +21,10 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [inputValue, setInputValue] = useState('');
 
+  // Empty-wallet gate: portfolioData loaded but no positions
+  const portfolioLoaded = portfolioData !== null && portfolioData !== undefined;
+  const isEmpty = portfolioLoaded && (!portfolioData?.positions?.length || portfolioData.totalValue === 0);
+
   // Derive mood from portfolio data
   const mood = useMemo(() => {
     if (!portfolioData?.positions?.length) return 'stable';
@@ -79,33 +83,34 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   };
 
   const playAudio = async (id: string, text: string) => {
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+
+    // Start browser speech immediately (zero latency) so the user hears something right away.
+    speakWithBrowser(id, text);
+
+    // Concurrently fetch high-quality TTS. If it arrives before browser speech ends,
+    // cut over; otherwise let browser speech finish.
     try {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-      setPlayingId(id);
       const response = await fetch('/api/voice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, mood, portfolioContext: portfolioData }),
       });
-      if (!response.ok) { speakWithBrowser(id, text); return; }
+      if (!response.ok) return;
       const blob = await response.blob();
-      if (blob.size === 0 || !blob.type.includes('audio')) { speakWithBrowser(id, text); return; }
+      if (blob.size === 0 || !blob.type.includes('audio')) return;
+      // Only cut over if this message is still the active one
+      if (playingId !== id && audioRef.current) return;
+      window.speechSynthesis.cancel();
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       audioRef.current = audio;
+      setPlayingId(id);
       audio.play();
-      audio.onended = () => {
-        setPlayingId(null);
-        URL.revokeObjectURL(url);
-      };
+      audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(url); };
     } catch {
-      speakWithBrowser(id, text);
+      // browser speech is already handling it
     }
   };
 
@@ -143,6 +148,19 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     'How is my Solana bag doing?',
     'If ETH drops 30%, what happens?',
   ];
+
+  if (isEmpty) {
+    return (
+      <div className="flex flex-col h-full bg-[#F5F5F7] items-center justify-center gap-4 px-8 text-center">
+        <VelaMascot size={52} thinking={false} speaking={false} />
+        <p className="text-[20px] font-semibold tracking-tight text-[#1D1D1F]">No positions found</p>
+        <p className="text-[13px] text-[#AEAEB2] leading-relaxed">
+          This wallet has no tokens on {chainType === 'solana' ? 'Solana' : 'this chain'}.<br />
+          Try a different address or chain.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-[#F5F5F7]">
