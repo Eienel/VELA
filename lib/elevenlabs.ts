@@ -10,8 +10,9 @@ export async function streamVoice(text: string): Promise<Response> {
       },
       body: JSON.stringify({
         text,
-        model_id: 'eleven_turbo_v2',
+        model_id: 'eleven_flash_v2_5',
         voice_settings: { stability: 0.4, similarity_boost: 0.8 },
+        optimize_streaming_latency: 4,
       }),
     }
   );

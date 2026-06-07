@@ -84,33 +84,72 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
   const playAudio = async (id: string, text: string) => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
-    if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
+    setPlayingId(id);
 
-    // Start browser speech immediately (zero latency) so the user hears something right away.
-    speakWithBrowser(id, text);
-
-    // Concurrently fetch high-quality TTS. If it arrives before browser speech ends,
-    // cut over; otherwise let browser speech finish.
     try {
       const response = await fetch('/api/voice', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, mood, portfolioContext: portfolioData }),
       });
-      if (!response.ok) return;
+      if (!response.ok || !response.body) throw new Error('voice fetch failed');
+
+      // MediaSource streaming: pipe chunks straight to audio as they arrive.
+      // First audio plays ~300ms after response starts, not after full download.
+      const canStream =
+        typeof window !== 'undefined' &&
+        'MediaSource' in window &&
+        MediaSource.isTypeSupported('audio/mpeg');
+
+      if (canStream) {
+        const ms = new MediaSource();
+        const audio = new Audio(URL.createObjectURL(ms));
+        audioRef.current = audio;
+
+        await new Promise<void>(resolve => {
+          ms.addEventListener('sourceopen', async () => {
+            resolve();
+            const sb = ms.addSourceBuffer('audio/mpeg');
+            const reader = response.body!.getReader();
+
+            const append = (chunk: Uint8Array) =>
+              new Promise<void>(res => {
+                if (sb.updating) sb.addEventListener('updateend', () => res(), { once: true });
+                else res();
+              }).then(() => { sb.appendBuffer(chunk.buffer.slice(chunk.byteOffset, chunk.byteOffset + chunk.byteLength) as ArrayBuffer); });
+
+            try {
+              for (;;) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                await append(value);
+              }
+              await new Promise<void>(res => {
+                if (sb.updating) sb.addEventListener('updateend', () => res(), { once: true });
+                else res();
+              });
+              ms.endOfStream();
+            } catch {
+              try { ms.endOfStream(); } catch { /* already ended */ }
+            }
+          }, { once: true });
+        });
+
+        audio.play().catch(() => speakWithBrowser(id, text));
+        audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(audio.src); };
+        return;
+      }
+
+      // Fallback for browsers without MediaSource (e.g. iOS Safari): buffer full blob.
       const blob = await response.blob();
-      if (blob.size === 0 || !blob.type.includes('audio')) return;
-      // Only cut over if this message is still the active one
-      if (playingId !== id && audioRef.current) return;
-      window.speechSynthesis.cancel();
+      if (!blob.type.includes('audio')) throw new Error('not audio');
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
       audioRef.current = audio;
-      setPlayingId(id);
       audio.play();
       audio.onended = () => { setPlayingId(null); URL.revokeObjectURL(url); };
     } catch {
-      // browser speech is already handling it
+      speakWithBrowser(id, text);
     }
   };
 
