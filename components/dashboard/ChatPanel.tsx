@@ -7,6 +7,7 @@ import VelaMascot from './VelaMascot';
 import MessageBubble from './MessageBubble';
 import ReasoningSteps from './ReasoningSteps';
 import VoiceButton from './VoiceButton';
+import { getMood, getSuggestedQuestions } from '@/lib/portfolio-summary';
 
 interface Props {
   walletAddress: string;
@@ -26,18 +27,15 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const portfolioLoaded = portfolioData !== null && portfolioData !== undefined;
   const isEmpty = portfolioLoaded && (!portfolioData?.positions?.length || portfolioData.totalValue === 0);
 
-  // Derive mood from portfolio data
-  const mood = useMemo(() => {
-    if (!portfolioData?.positions?.length) return 'stable';
-    const change24h = portfolioData.positions.reduce(
-      (sum: number, p: any) => sum + (p.valueUSD * p.change24h / 100), 0
-    );
-    const pct = portfolioData.totalValue > 0 ? (change24h / portfolioData.totalValue) * 100 : 0;
-    if (pct > 3) return 'thriving';
-    if (pct > -1) return 'stable';
-    if (pct > -5) return 'worried';
-    return 'devastated';
-  }, [portfolioData]);
+  const mood = useMemo(
+    () => getMood(portfolioData?.positions || [], portfolioData?.totalValue || 0),
+    [portfolioData]
+  );
+
+  const suggestedQuestions = useMemo(
+    () => getSuggestedQuestions(portfolioData?.positions || [], mood),
+    [portfolioData, mood]
+  );
 
   const transport = useMemo(
     () =>
@@ -148,11 +146,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     return textPart ? textPart.text : '';
   };
 
-  const suggestedQuestions = [
-    'What is my biggest risk?',
-    'How is my Solana bag doing?',
-    'If ETH drops 30%, what happens?',
-  ];
 
   if (isEmpty) {
     return (
@@ -177,7 +170,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
           speaking={!!playingId}
         />
         <div className="text-[11px] text-[#AEAEB2] mt-2 uppercase tracking-[0.2em] font-mono">
-          {isLoading ? 'Thinking...' : playingId ? 'Speaking' : 'Ready'}
+          {isLoading ? 'Thinking...' : playingId ? 'Speaking' : mood === 'thriving' ? '🟢 Thriving' : mood === 'worried' ? '🟡 Worried' : mood === 'devastated' ? '🔴 Devastated' : 'Ready'}
         </div>
       </div>
 

@@ -1,46 +1,74 @@
 import { streamText, convertToModelMessages } from 'ai';
 import { google } from '@ai-sdk/google';
 import { NextRequest } from 'next/server';
-import { saveQuery } from '@/lib/mongodb';
+import { saveQuery, getQueryHistory } from '@/lib/mongodb';
+import { formatPortfolioSummary, getMood, getMoodPersonality } from '@/lib/portfolio-summary';
 
-const VELA_BASE = `You are Vela, a crypto portfolio AI with a distinct personality. You speak as if you ARE the wallet — first-person, emotionally invested in the performance.
-You have access to the user's real on-chain data across EVM chains and Solana.
-Always cite specific numbers from the provided data. Speak directly to the user.
-Never say "I think" or "perhaps" — speak with conviction.
-Format dollar amounts with $ prefix. Format percentages with % suffix.
-Keep answers to two to four sentences maximum — your answer is read aloud.
-Never use dashes as separators.
-If the portfolio data is empty, say so plainly. Never invent positions or numbers not in the data.`;
+const VELA_CORE = `You are Vela — an AI that speaks AS the wallet itself. You ARE the portfolio, alive and emotionally invested.
+
+RULES (never break these):
+- Speak in first person. "I'm up 2.7% today." "My worst position is ARB."
+- Never hedge. No "I think", "perhaps", "it seems", "might". State facts.
+- 2 to 4 sentences maximum. Your words are read aloud — brevity is everything.
+- No bullet points, no markdown, no dashes as separators. Plain spoken sentences only.
+- Always cite real numbers from the portfolio data. Never invent positions or values.
+- Dollar amounts use $ prefix. Percentages use % suffix.
+- If asked something outside your data, say so in one sentence and redirect.`;
 
 export async function POST(req: NextRequest) {
-  const { messages, portfolioContext, walletAddress, moodOverride } = await req.json();
+  const { messages, portfolioContext, walletAddress } = await req.json();
 
-  const system = moodOverride ? `${VELA_BASE}\n\nTone instruction: ${moodOverride}` : VELA_BASE;
+  const positions = portfolioContext?.positions || [];
+  const totalValue = portfolioContext?.totalValue || 0;
+  const mood = getMood(positions, totalValue);
+  const moodPersonality = getMoodPersonality(mood);
+  const portfolioSummary = formatPortfolioSummary(portfolioContext);
 
-  const augmentedMessages = portfolioContext
-    ? messages.map((msg: any, i: number) => {
-        if (i === messages.length - 1 && msg.role === 'user') {
-          const userText =
-            typeof msg.content === 'string'
-              ? msg.content
-              : msg.parts?.find((p: any) => p.type === 'text')?.text || '';
-          return {
-            ...msg,
-            content: `Current portfolio data:\n${JSON.stringify(portfolioContext, null, 2)}\n\nUser question: ${userText}`,
-            parts: msg.parts
-              ? msg.parts.map((p: any) =>
-                  p.type === 'text'
-                    ? { ...p, text: `Current portfolio data:\n${JSON.stringify(portfolioContext, null, 2)}\n\nUser question: ${p.text}` }
-                    : p
-                )
-              : undefined,
-          };
-        }
-        return msg;
-      })
-    : messages;
+  // Load recent query history from MongoDB for conversational memory
+  let historyContext = '';
+  if (walletAddress) {
+    try {
+      const history = await getQueryHistory(walletAddress, 5);
+      if (history.length > 0) {
+        const recent = history
+          .reverse()
+          .map((q: any) => `Q: ${q.question}\nA: ${q.answer}`)
+          .join('\n\n');
+        historyContext = `\n\nRECENT CONVERSATION HISTORY:\n${recent}`;
+      }
+    } catch {
+      // MongoDB not configured — skip history
+    }
+  }
 
-  const modelMessages = await convertToModelMessages(augmentedMessages);
+  const system = `${VELA_CORE}
+
+CURRENT MOOD & TONE:
+${moodPersonality}
+
+PORTFOLIO DATA:
+${portfolioSummary}${historyContext}`;
+
+  // Strip portfolio context from individual messages — it's now in the system prompt
+  const cleanMessages = messages.map((msg: any) => {
+    if (msg.role !== 'user') return msg;
+    const text =
+      typeof msg.content === 'string'
+        ? msg.content
+        : msg.parts?.find((p: any) => p.type === 'text')?.text || '';
+    // Remove any previously injected portfolio JSON blob
+    const clean = text.replace(/^Current portfolio data:[\s\S]*?User question: /m, '');
+    return typeof msg.content === 'string'
+      ? { ...msg, content: clean }
+      : {
+          ...msg,
+          parts: msg.parts?.map((p: any) =>
+            p.type === 'text' ? { ...p, text: clean } : p
+          ),
+        };
+  });
+
+  const modelMessages = await convertToModelMessages(cleanMessages);
 
   const result = streamText({
     model: google('gemini-2.5-flash'),
@@ -52,12 +80,14 @@ export async function POST(req: NextRequest) {
     onFinish: async ({ text }) => {
       if (walletAddress) {
         try {
+          const lastMsg = messages[messages.length - 1];
+          const question =
+            typeof lastMsg?.content === 'string'
+              ? lastMsg.content
+              : lastMsg?.parts?.find((p: any) => p.type === 'text')?.text;
           await saveQuery({
             walletAddress,
-            question:
-              typeof messages[messages.length - 1]?.content === 'string'
-                ? messages[messages.length - 1]?.content
-                : messages[messages.length - 1]?.parts?.find((p: any) => p.type === 'text')?.text,
+            question,
             answer: text,
             audioPlayed: false,
             timestamp: new Date(),
