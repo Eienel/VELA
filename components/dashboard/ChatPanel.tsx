@@ -151,9 +151,11 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   };
 
   const getMessageText = (msg: any): string => {
-    if (typeof msg.content === 'string') return msg.content;
-    const textPart = msg.parts?.find((p: any) => p.type === 'text');
-    return textPart ? textPart.text : '';
+    const raw = typeof msg.content === 'string'
+      ? msg.content
+      : msg.parts?.find((p: any) => p.type === 'text')?.text ?? '';
+    // Strip injected portfolio context before displaying to the user
+    return raw.replace(/^\[PORTFOLIO_CONTEXT\][\s\S]*?\[\/PORTFOLIO_CONTEXT\]\n?/, '');
   };
 
 
