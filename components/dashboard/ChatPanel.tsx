@@ -262,7 +262,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       </div>
 
       {/* Input */}
-      <div className="px-4 py-3 border-t border-[#E5E5EA] bg-white">
+      <div className="px-4 py-3 pb-[max(12px,env(safe-area-inset-bottom))] border-t border-[#E5E5EA] bg-white">
         <form onSubmit={onSubmit} className="flex items-center gap-2 bg-[#F5F5F7] border border-[#D2D2D7] rounded-full px-4 py-2">
           <VoiceButton onTranscript={handleVoiceTranscript} disabled={isLoading} />
           <input

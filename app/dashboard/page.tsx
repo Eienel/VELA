@@ -69,13 +69,40 @@ export default function Dashboard() {
     );
   }
 
+  // Compute 24h change for the mobile balance bar
+  const change24h = portfolioData?.positions?.reduce(
+    (sum: number, p: any) => sum + (p.valueUSD * p.change24h / 100), 0
+  ) ?? 0;
+  const change24hPct = portfolioData?.totalValue > 0
+    ? (change24h / portfolioData.totalValue) * 100
+    : 0;
+
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-[100dvh]">
       <TopNav address={address} chainType={chainType} onDisconnect={handleDisconnect} />
-      <div className="grid flex-1 overflow-hidden" style={{ gridTemplateColumns: '280px 1fr 300px' }}>
-        <WalletPanel address={address} chainType={chainType} apiChain={apiChain} />
+
+      {/* Mobile-only balance bar */}
+      {portfolioData && (
+        <div className="md:hidden flex items-center justify-between px-4 py-2.5 bg-white border-b border-[#E5E5EA]">
+          <span className="text-[17px] font-semibold tracking-tight text-[#1D1D1F]">
+            ${(portfolioData.totalValue ?? 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+          <span className={`font-mono text-[13px] font-medium ${change24h >= 0 ? 'text-[#34C759]' : 'text-[#FF3B30]'}`}>
+            {change24h >= 0 ? '+' : ''}{change24hPct.toFixed(2)}%
+            <span className="text-[#AEAEB2] font-sans font-normal ml-1 text-[12px]">today</span>
+          </span>
+        </div>
+      )}
+
+      {/* Desktop: three-column grid · Mobile: chat only */}
+      <div className="flex-1 overflow-hidden md:grid" style={{ gridTemplateColumns: '280px 1fr 300px' }}>
+        <div className="hidden md:block">
+          <WalletPanel address={address} chainType={chainType} apiChain={apiChain} />
+        </div>
         <ChatPanel walletAddress={address} chainType={chainType} portfolioData={portfolioData} />
-        <PortfolioPanel address={address} chainType={chainType} />
+        <div className="hidden md:block">
+          <PortfolioPanel address={address} chainType={chainType} />
+        </div>
       </div>
     </div>
   );
