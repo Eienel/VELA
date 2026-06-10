@@ -62,15 +62,15 @@ export default function Hero() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-6xl mx-auto px-6 pt-20 pb-24 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-16 items-center">
+      <section className="max-w-6xl mx-auto px-6 pt-12 md:pt-20 pb-16 md:pb-24 grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-10 lg:gap-16 items-center">
 
         {/* Left */}
         <div>
-          <p className="text-[12px] font-mono text-[#AEAEB2] uppercase tracking-[0.2em] mb-6">
+          <p className="text-[11px] md:text-[12px] font-mono text-[#AEAEB2] uppercase tracking-[0.2em] mb-5 md:mb-6">
             Portfolio Intelligence · ETH · Base · Arbitrum · Solana
           </p>
 
-          <h1 className="text-[60px] md:text-[72px] font-bold tracking-[-0.04em] leading-[1.0] mb-6">
+          <h1 className="text-[42px] sm:text-[56px] md:text-[72px] font-bold tracking-[-0.04em] leading-[1.0] mb-6">
             <span className="text-[#1D1D1F]">Your wallet,</span><br />
             <span className="text-[#B0B0B5]">answering back.</span>
           </h1>
