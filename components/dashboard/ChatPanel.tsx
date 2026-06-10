@@ -20,8 +20,12 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const [playingId, setPlayingId] = useState<string | null>(null);
   const [reasoningStep, setReasoningStep] = useState<number>(-1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const cachedAudio = useRef<Record<string, string>>({}); // messageId → blob URL for replay
+  const cachedAudio = useRef<Record<string, string>>({});
   const [inputValue, setInputValue] = useState('');
+
+  // Streaming speech refs
+  const spokenUpTo = useRef(0);       // char index into current assistant message already queued
+  const streamingMsgId = useRef<string | null>(null); // id of the message currently streaming
 
   // Empty-wallet gate: portfolioData loaded but no positions
   const portfolioLoaded = portfolioData !== null && portfolioData !== undefined;
@@ -60,66 +64,112 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       setReasoningStep(3);
       setTimeout(() => setReasoningStep(-1), 500);
       const textPart = message.parts?.find((p: any) => p.type === 'text');
-      const text = textPart ? (textPart as any).text : '';
-      if (text) playAudio(message.id, text);
+      const fullText = textPart ? (textPart as any).text : '';
+      if (!fullText) return;
+
+      // Speak any remaining text that didn't end with a sentence boundary
+      const remaining = fullText.slice(spokenUpTo.current).trim();
+      if (remaining) {
+        queueSpeech(remaining, () => setPlayingId(null));
+      } else {
+        // All sentences already queued — just ensure playingId clears when queue drains
+        // (the last queued utterance's onend handles it if remaining was empty)
+        if (!window.speechSynthesis?.speaking) setPlayingId(null);
+      }
+      // Reset for next message
+      spokenUpTo.current = 0;
+      streamingMsgId.current = null;
     },
   });
 
   const isLoading = status === 'submitted' || status === 'streaming';
 
-  // Instant browser speech — zero network, zero latency.
-  const speakWithBrowser = (id: string, text: string) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) { setPlayingId(null); return; }
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.05;
-    utterance.pitch = 1.05;
-    // Prefer a natural-sounding en-US voice if available
+  const getBestVoice = () => {
+    if (typeof window === 'undefined') return undefined;
     const voices = window.speechSynthesis.getVoices();
-    const preferred =
+    return (
       voices.find(v => /en[-_]US/i.test(v.lang) && /Samantha|Karen|Google US English|Zira/i.test(v.name)) ||
       voices.find(v => /en[-_]US/i.test(v.lang)) ||
-      voices.find(v => /en/i.test(v.lang));
-    if (preferred) utterance.voice = preferred;
-    utterance.onend = () => setPlayingId(null);
-    setPlayingId(id);
-    window.speechSynthesis.speak(utterance);
+      voices.find(v => /en/i.test(v.lang))
+    );
   };
 
-  // Play audio for a message. Primary: instant Web Speech. Simultaneously
-  // fetch ElevenLabs in the background — cache it so replaying (the ↺ button)
-  // uses the high-quality version instead of re-fetching.
+  // Queue a chunk of text into the browser speech queue without cancelling.
+  // onDone fires after this specific utterance ends.
+  const queueSpeech = (text: string, onDone?: () => void) => {
+    if (!text.trim() || typeof window === 'undefined' || !window.speechSynthesis) return;
+    const u = new SpeechSynthesisUtterance(text.trim());
+    u.rate = 1.05;
+    u.pitch = 1.05;
+    const v = getBestVoice();
+    if (v) u.voice = v;
+    if (onDone) u.onend = onDone;
+    window.speechSynthesis.speak(u);
+  };
+
+  // Replay: speak full text for a message (cancels current speech first).
   const playAudio = (id: string, text: string) => {
     if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
     window.speechSynthesis?.cancel();
+    setPlayingId(id);
 
-    // If we already have a high-quality cached blob for this message, play it.
+    // Cached high-quality blob from a previous ElevenLabs fetch → use that.
     if (cachedAudio.current[id]) {
       const audio = new Audio(cachedAudio.current[id]);
       audioRef.current = audio;
-      setPlayingId(id);
       audio.play();
       audio.onended = () => setPlayingId(null);
       return;
     }
 
-    // Speak immediately with browser voice.
-    speakWithBrowser(id, text);
+    queueSpeech(text, () => setPlayingId(null));
 
-    // Fetch ElevenLabs in the background and cache silently (no cutover mid-speech).
+    // Cache ElevenLabs blob silently for future replays.
     fetch('/api/voice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text, mood, portfolioContext: portfolioData }),
     })
       .then(r => (r.ok ? r.blob() : null))
-      .then(blob => {
-        if (blob && blob.type.includes('audio')) {
-          cachedAudio.current[id] = URL.createObjectURL(blob);
-        }
-      })
-      .catch(() => {/* silent — browser speech already handled it */});
+      .then(blob => { if (blob?.type.includes('audio')) cachedAudio.current[id] = URL.createObjectURL(blob); })
+      .catch(() => {});
   };
+
+  // Sentence-streaming: speak each complete sentence the moment Gemini generates it.
+  useEffect(() => {
+    if (status !== 'streaming') return;
+    const lastMsg = messages[messages.length - 1];
+    if (!lastMsg || lastMsg.role !== 'assistant') return;
+
+    const fullText = getMessageText(lastMsg);
+
+    // First chunk of a new streaming message → reset and start speaking
+    if (lastMsg.id !== streamingMsgId.current) {
+      window.speechSynthesis?.cancel();
+      streamingMsgId.current = lastMsg.id;
+      spokenUpTo.current = 0;
+      setPlayingId(lastMsg.id);
+    }
+
+    // Greedily consume complete sentences from the unspoken tail
+    let tail = fullText.slice(spokenUpTo.current);
+    // Sentence boundary: .!? followed by a space or end-of-string, not preceded by a digit
+    // (avoids splitting "$9.5k" or "-1.72%")
+    const sentenceRe = /([^.]*?[.!?])(?=\s|$)/g;
+    let match: RegExpExecArray | null;
+    while ((match = sentenceRe.exec(tail)) !== null) {
+      const sentence = match[1].trim();
+      if (!sentence) continue;
+      // Skip if it looks like a decimal number boundary (digit.digit)
+      const before = tail[match.index - 1];
+      if (before && /\d/.test(before)) continue;
+      spokenUpTo.current += match.index + match[0].length;
+      tail = fullText.slice(spokenUpTo.current);
+      sentenceRe.lastIndex = 0;
+      queueSpeech(sentence);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, status]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -127,6 +177,10 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
   const handleSend = (text: string) => {
     if (!text.trim()) return;
+    window.speechSynthesis?.cancel();
+    setPlayingId(null);
+    spokenUpTo.current = 0;
+    streamingMsgId.current = null;
     setReasoningStep(0);
     setTimeout(() => setReasoningStep(1), 400);
     setTimeout(() => setReasoningStep(2), 800);
