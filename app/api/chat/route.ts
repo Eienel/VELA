@@ -16,7 +16,30 @@ RULES (never break these):
 - If asked something outside your data, say so in one sentence and redirect.`;
 
 export async function POST(req: NextRequest) {
-  const { messages, portfolioContext, walletAddress } = await req.json();
+  const body = await req.json();
+  const walletAddress = body.walletAddress;
+  let messages = body.messages;
+  let portfolioContext = body.portfolioContext;
+
+  // Extract portfolio context injected inline into the last user message
+  if (messages?.length) {
+    const last = messages[messages.length - 1];
+    const rawText =
+      typeof last.content === 'string'
+        ? last.content
+        : last.parts?.find((p: any) => p.type === 'text')?.text || '';
+    const match = rawText.match(/^\[PORTFOLIO_CONTEXT\]([\s\S]*?)\[\/PORTFOLIO_CONTEXT\]\n?([\s\S]*)$/);
+    if (match) {
+      try { portfolioContext = JSON.parse(match[1]); } catch { /* keep existing */ }
+      const cleanText = match[2];
+      messages = messages.map((msg: any, i: number) => {
+        if (i !== messages.length - 1) return msg;
+        return typeof msg.content === 'string'
+          ? { ...msg, content: cleanText }
+          : { ...msg, parts: msg.parts?.map((p: any) => p.type === 'text' ? { ...p, text: cleanText } : p) };
+      });
+    }
+  }
 
   const positions = portfolioContext?.positions || [];
   const totalValue = portfolioContext?.totalValue || 0;

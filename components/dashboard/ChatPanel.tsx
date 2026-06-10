@@ -37,17 +37,21 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     [portfolioData, mood]
   );
 
+  // Always-current ref — avoids stale closure in the transport body
+  const portfolioRef = useRef(portfolioData);
+  useEffect(() => { portfolioRef.current = portfolioData; }, [portfolioData]);
+
+  // Stable transport — never recreated, so useChat never resets mid-conversation.
+  // portfolioContext is read from portfolioRef (always current) at send time.
   const transport = useMemo(
     () =>
       new TextStreamChatTransport({
         api: '/api/chat',
-        body: {
-          walletAddress,
-          portfolioContext: portfolioData,
-        },
+        headers: {},
+        // body is a static base — we merge fresh portfolioContext per send in handleSend
+        body: { walletAddress },
       }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [walletAddress, portfolioData]
+    [walletAddress]
   );
 
   const { messages, sendMessage, status } = useChat({
@@ -126,7 +130,13 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     setReasoningStep(0);
     setTimeout(() => setReasoningStep(1), 400);
     setTimeout(() => setReasoningStep(2), 800);
-    sendMessage({ text });
+    // Inject current portfolio data into the message text so the server
+    // always has fresh context regardless of when the transport was created.
+    const portfolio = portfolioRef.current;
+    const enrichedText = portfolio?.positions?.length
+      ? `[PORTFOLIO_CONTEXT]${JSON.stringify(portfolio)}[/PORTFOLIO_CONTEXT]\n${text}`
+      : text;
+    sendMessage({ text: enrichedText });
     setInputValue('');
   };
 
