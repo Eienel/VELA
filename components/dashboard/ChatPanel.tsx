@@ -21,6 +21,8 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedAudio = useRef<Record<string, string>>({});
   const [inputValue, setInputValue] = useState('');
+  // IDs of messages that are done generating but waiting for voice to actually start
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
 
   // Empty-wallet gate: portfolioData loaded but no positions
   const portfolioLoaded = portfolioData !== null && portfolioData !== undefined;
@@ -59,9 +61,14 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       const textPart = message.parts?.find((p: any) => p.type === 'text');
       const fullText = textPart ? (textPart as any).text : '';
       if (!fullText) return;
-      // Text reveals (pending→false) and voice start together
+      // Hide text until voice actually starts playing
+      setHiddenIds(prev => new Set(prev).add(message.id));
       setPlayingId(message.id);
-      queueSpeech(fullText, () => setPlayingId(null));
+      queueSpeech(
+        fullText,
+        () => setPlayingId(null),                                         // onend
+        () => setHiddenIds(prev => { const s = new Set(prev); s.delete(message.id); return s; }) // onstart
+      );
     },
   });
 
@@ -77,15 +84,17 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     );
   };
 
-  // Queue a chunk of text into the browser speech queue without cancelling.
-  // onDone fires after this specific utterance ends.
-  const queueSpeech = (text: string, onDone?: () => void) => {
-    if (!text.trim() || typeof window === 'undefined' || !window.speechSynthesis) return;
+  const queueSpeech = (text: string, onDone?: () => void, onStart?: () => void) => {
+    if (!text.trim() || typeof window === 'undefined' || !window.speechSynthesis) {
+      onStart?.();
+      return;
+    }
     const u = new SpeechSynthesisUtterance(text.trim());
     u.rate = 1.05;
     u.pitch = 1.05;
     const v = getBestVoice();
     if (v) u.voice = v;
+    if (onStart) u.onstart = onStart;
     if (onDone) u.onend = onDone;
     window.speechSynthesis.speak(u);
   };
@@ -127,6 +136,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     if (!text.trim()) return;
     window.speechSynthesis?.cancel();
     setPlayingId(null);
+    setHiddenIds(new Set());
     setReasoningStep(0);
     setTimeout(() => setReasoningStep(1), 400);
     setTimeout(() => setReasoningStep(2), 800);
@@ -210,7 +220,7 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
         {messages.map((msg, i) => {
           const text = getMessageText(msg);
-          const isStreamingThis = isLoading && i === messages.length - 1 && msg.role === 'assistant';
+          const isStreamingThis = (isLoading && i === messages.length - 1 && msg.role === 'assistant') || hiddenIds.has(msg.id);
           return (
             <div key={msg.id}>
               <MessageBubble
