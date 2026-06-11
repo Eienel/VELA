@@ -61,13 +61,20 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       const textPart = message.parts?.find((p: any) => p.type === 'text');
       const fullText = textPart ? (textPart as any).text : '';
       if (!fullText) return;
-      // Hide text until voice actually starts playing
+
+      const revealText = () =>
+        setHiddenIds(prev => { const s = new Set(prev); s.delete(message.id); return s; });
+
       setHiddenIds(prev => new Set(prev).add(message.id));
       setPlayingId(message.id);
+
+      // Fallback: reveal text after 600ms regardless — iOS Safari onstart is unreliable
+      const fallback = setTimeout(revealText, 600);
+
       queueSpeech(
         fullText,
-        () => setPlayingId(null),                                         // onend
-        () => setHiddenIds(prev => { const s = new Set(prev); s.delete(message.id); return s; }) // onstart
+        () => setPlayingId(null),
+        () => { clearTimeout(fallback); revealText(); }
       );
     },
   });
