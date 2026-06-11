@@ -5,7 +5,6 @@ import { useEffect, useRef, useState, useMemo } from 'react';
 import { ArrowUp } from '@phosphor-icons/react';
 import VelaMascot from './VelaMascot';
 import MessageBubble from './MessageBubble';
-import ReasoningSteps from './ReasoningSteps';
 import VoiceButton from './VoiceButton';
 import { getMood, getSuggestedQuestions } from '@/lib/portfolio-summary';
 
@@ -22,10 +21,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cachedAudio = useRef<Record<string, string>>({});
   const [inputValue, setInputValue] = useState('');
-
-  // Streaming speech refs
-  const spokenUpTo = useRef(0);       // char index into current assistant message already queued
-  const streamingMsgId = useRef<string | null>(null); // id of the message currently streaming
 
   // Empty-wallet gate: portfolioData loaded but no positions
   const portfolioLoaded = portfolioData !== null && portfolioData !== undefined;
@@ -61,24 +56,12 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
   const { messages, sendMessage, status } = useChat({
     transport,
     onFinish: ({ message }) => {
-      setReasoningStep(3);
-      setTimeout(() => setReasoningStep(-1), 500);
       const textPart = message.parts?.find((p: any) => p.type === 'text');
       const fullText = textPart ? (textPart as any).text : '';
       if (!fullText) return;
-
-      // Speak any remaining text that didn't end with a sentence boundary
-      const remaining = fullText.slice(spokenUpTo.current).trim();
-      if (remaining) {
-        queueSpeech(remaining, () => setPlayingId(null));
-      } else {
-        // All sentences already queued — just ensure playingId clears when queue drains
-        // (the last queued utterance's onend handles it if remaining was empty)
-        if (!window.speechSynthesis?.speaking) setPlayingId(null);
-      }
-      // Reset for next message
-      spokenUpTo.current = 0;
-      streamingMsgId.current = null;
+      // Text reveals (pending→false) and voice start together
+      setPlayingId(message.id);
+      queueSpeech(fullText, () => setPlayingId(null));
     },
   });
 
@@ -135,41 +118,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
       .catch(() => {});
   };
 
-  // Sentence-streaming: speak each complete sentence the moment Gemini generates it.
-  useEffect(() => {
-    if (status !== 'streaming') return;
-    const lastMsg = messages[messages.length - 1];
-    if (!lastMsg || lastMsg.role !== 'assistant') return;
-
-    const fullText = getMessageText(lastMsg);
-
-    // First chunk of a new streaming message → reset and start speaking
-    if (lastMsg.id !== streamingMsgId.current) {
-      window.speechSynthesis?.cancel();
-      streamingMsgId.current = lastMsg.id;
-      spokenUpTo.current = 0;
-      setPlayingId(lastMsg.id);
-    }
-
-    // Greedily consume complete sentences from the unspoken tail
-    let tail = fullText.slice(spokenUpTo.current);
-    // Sentence boundary: .!? followed by a space or end-of-string, not preceded by a digit
-    // (avoids splitting "$9.5k" or "-1.72%")
-    const sentenceRe = /([^.]*?[.!?])(?=\s|$)/g;
-    let match: RegExpExecArray | null;
-    while ((match = sentenceRe.exec(tail)) !== null) {
-      const sentence = match[1].trim();
-      if (!sentence) continue;
-      // Skip if it looks like a decimal number boundary (digit.digit)
-      const before = tail[match.index - 1];
-      if (before && /\d/.test(before)) continue;
-      spokenUpTo.current += match.index + match[0].length;
-      tail = fullText.slice(spokenUpTo.current);
-      sentenceRe.lastIndex = 0;
-      queueSpeech(sentence);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messages, status]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -179,8 +127,6 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
     if (!text.trim()) return;
     window.speechSynthesis?.cancel();
     setPlayingId(null);
-    spokenUpTo.current = 0;
-    streamingMsgId.current = null;
     setReasoningStep(0);
     setTimeout(() => setReasoningStep(1), 400);
     setTimeout(() => setReasoningStep(2), 800);
@@ -264,24 +210,19 @@ export default function ChatPanel({ walletAddress, chainType, portfolioData }: P
 
         {messages.map((msg, i) => {
           const text = getMessageText(msg);
+          const isStreamingThis = isLoading && i === messages.length - 1 && msg.role === 'assistant';
           return (
             <div key={msg.id}>
-              {msg.role === 'assistant' && isLoading && i === messages.length - 1 && reasoningStep >= 0 && reasoningStep < 3 && (
-                <ReasoningSteps activeStep={reasoningStep} />
-              )}
               <MessageBubble
                 role={msg.role as 'user' | 'assistant'}
                 content={text}
+                pending={isStreamingThis}
                 onReplay={msg.role === 'assistant' ? () => playAudio(msg.id, text) : undefined}
                 isPlaying={playingId === msg.id}
               />
             </div>
           );
         })}
-
-        {isLoading && reasoningStep >= 0 && reasoningStep < 3 && messages[messages.length - 1]?.role === 'user' && (
-          <ReasoningSteps activeStep={reasoningStep} />
-        )}
 
         <div ref={messagesEndRef} />
       </div>

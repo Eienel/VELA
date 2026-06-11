@@ -7,6 +7,7 @@ interface Props {
   content: string;
   onReplay?: () => void;
   isPlaying?: boolean;
+  pending?: boolean;
 }
 
 function HighlightedText({ text }: { text: string }) {
@@ -24,7 +25,7 @@ function HighlightedText({ text }: { text: string }) {
   );
 }
 
-export default function MessageBubble({ role, content, onReplay, isPlaying }: Props) {
+export default function MessageBubble({ role, content, onReplay, isPlaying, pending }: Props) {
   if (role === 'user') {
     return (
       <motion.div
@@ -48,11 +49,30 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
       className="flex gap-3 mb-4"
     >
       <div className="flex-1">
-        <div className="text-[14px] text-[#1D1D1F] leading-relaxed">
-          <HighlightedText text={content} />
-        </div>
+        {pending ? (
+          <div className="flex gap-0.5 items-end h-4 py-1">
+            {[0, 1, 2, 3, 4].map(i => (
+              <motion.div
+                key={i}
+                animate={{ scaleY: [0.2, 1, 0.2] }}
+                transition={{ duration: 0.7, repeat: Infinity, delay: i * 0.12 }}
+                className="w-0.5 bg-[#AEAEB2] rounded-full origin-bottom"
+                style={{ height: '100%' }}
+              />
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.25 }}
+            className="text-[14px] text-[#1D1D1F] leading-relaxed"
+          >
+            <HighlightedText text={content} />
+          </motion.div>
+        )}
 
-        {isPlaying && (
+        {!pending && isPlaying && (
           <div className="flex gap-0.5 items-end h-3 mt-2">
             {[0, 1, 2, 3, 4].map(i => (
               <motion.div
@@ -66,7 +86,7 @@ export default function MessageBubble({ role, content, onReplay, isPlaying }: Pr
           </div>
         )}
 
-        {onReplay && (
+        {!pending && onReplay && (
           <button
             onClick={onReplay}
             className="mt-2 flex items-center gap-1.5 text-[12px] text-[#AEAEB2] hover:text-[#6E6E73] transition-colors"
